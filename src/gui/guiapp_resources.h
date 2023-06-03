@@ -6,7 +6,7 @@
 /*  Studio User Guide, or visit our web site at azure.com/rtos                 */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy):  2. 6.2023   Time (hh:mm): 19:31                        */
+/*  Date (dd.mm.yyyy):  3. 6.2023   Time (hh:mm): 20:41                        */
 /*******************************************************************************/
 
 
@@ -79,7 +79,12 @@
 #define GX_PIXELMAP_ID_CHECKBOX_ON 3
 #define GX_PIXELMAP_ID_CHECKBOX_OFF 4
 #define GX_PIXELMAP_ID_AST 5
-#define DISPLAY_1_PIXELMAP_TABLE_SIZE 6
+#define GX_PIXELMAP_ID_ASTEROIDE1 6
+#define GX_PIXELMAP_ID_ASTEROIDE2 7
+#define GX_PIXELMAP_ID_ASTEROIDE3 8
+#define GX_PIXELMAP_ID_ASTEROIDE4 9
+#define GX_PIXELMAP_ID_NAVE 10
+#define DISPLAY_1_PIXELMAP_TABLE_SIZE 11
 
 /* String Ids                                                                  */
 

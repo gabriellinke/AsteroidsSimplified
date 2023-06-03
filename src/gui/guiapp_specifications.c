@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy):  2. 6.2023   Time (hh:mm): 19:31                        */
+/*  Date (dd.mm.yyyy):  3. 6.2023   Time (hh:mm): 20:41                        */
 /*******************************************************************************/
 
 
@@ -103,10 +103,10 @@ GX_WINDOW_PROPERTIES window2_properties =
 {
     0                                        /* wallpaper pixelmap id          */
 };
-GX_SPRITE_FRAME window2_sprite_frame_list[1] =
+GX_SPRITE_FRAME window2_asteroid_1_frame_list[1] =
 {
     {
-        GX_PIXELMAP_ID_AST,                  /* pixelmap id                    */
+        GX_PIXELMAP_ID_ASTEROIDE3,           /* pixelmap id                    */
         0,                                   /* x offset                       */
         0,                                   /* y offset                       */
         0,                                   /* frame delay                    */
@@ -115,9 +115,9 @@ GX_SPRITE_FRAME window2_sprite_frame_list[1] =
     }
 };
 
-GX_SPRITE_PROPERTIES window2_sprite_properties =
+GX_SPRITE_PROPERTIES window2_asteroid_1_properties =
 {
-    window2_sprite_frame_list,               /* address of frame list          */
+    window2_asteroid_1_frame_list,           /* address of frame list          */
     1,                                       /* frame count                    */
 };
 GX_PROMPT_PROPERTIES window2_score_properties =
@@ -126,6 +126,86 @@ GX_PROMPT_PROPERTIES window2_score_properties =
     GX_FONT_ID_PROMPT,                       /* font id                        */
     GX_COLOR_ID_WHITE,                       /* normal text color              */
     GX_COLOR_ID_WHITE                        /* selected text color            */
+};
+GX_SPRITE_FRAME window2_spaceship_frame_list[1] =
+{
+    {
+        GX_PIXELMAP_ID_NAVE,                 /* pixelmap id                    */
+        0,                                   /* x offset                       */
+        0,                                   /* y offset                       */
+        0,                                   /* frame delay                    */
+        GX_SPRITE_BACKGROUND_NO_ACTION,      /* background operation           */
+        255                                  /* alpha value                    */
+    }
+};
+
+GX_SPRITE_PROPERTIES window2_spaceship_properties =
+{
+    window2_spaceship_frame_list,            /* address of frame list          */
+    1,                                       /* frame count                    */
+};
+GX_SPRITE_FRAME window2_asteroid_2_frame_list[1] =
+{
+    {
+        GX_PIXELMAP_ID_ASTEROIDE2,           /* pixelmap id                    */
+        0,                                   /* x offset                       */
+        0,                                   /* y offset                       */
+        0,                                   /* frame delay                    */
+        GX_SPRITE_BACKGROUND_NO_ACTION,      /* background operation           */
+        255                                  /* alpha value                    */
+    }
+};
+
+GX_SPRITE_PROPERTIES window2_asteroid_2_properties =
+{
+    window2_asteroid_2_frame_list,           /* address of frame list          */
+    1,                                       /* frame count                    */
+};
+
+GX_CONST GX_STUDIO_WIDGET window2_asteroid_2_define =
+{
+    "asteroid_2",
+    GX_TYPE_SPRITE,                          /* widget type                    */
+    asteroids_2,                             /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_TRANSPARENT|GX_STYLE_ENABLED,   /* style flags */
+    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
+    sizeof(GX_SPRITE),                       /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    gx_studio_sprite_create,                 /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {42, 92, 57, 107},                       /* widget size                    */
+    GX_NULL,                                 /* no next widget                 */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(WINDOW2_CONTROL_BLOCK, window2_asteroid_2), /* control block      */
+    (void *) &window2_asteroid_2_properties  /* extended properties            */
+};
+
+GX_CONST GX_STUDIO_WIDGET window2_spaceship_define =
+{
+    "spaceship",
+    GX_TYPE_SPRITE,                          /* widget type                    */
+    spaceship,                               /* widget id                      */
+    #if defined(GX_WIDGET_USER_DATA)
+    0,                                       /* user data                      */
+    #endif
+    GX_STYLE_BORDER_NONE|GX_STYLE_TRANSPARENT|GX_STYLE_ENABLED,   /* style flags */
+    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
+    sizeof(GX_SPRITE),                       /* control block size             */
+    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
+    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
+    gx_studio_sprite_create,                 /* create function                */
+    GX_NULL,                                 /* drawing function override      */
+    GX_NULL,                                 /* event function override        */
+    {112, 148, 127, 171},                    /* widget size                    */
+    &window2_asteroid_2_define,              /* next widget definition         */
+    GX_NULL,                                 /* no child widgets               */ 
+    offsetof(WINDOW2_CONTROL_BLOCK, window2_spaceship), /* control block       */
+    (void *) &window2_spaceship_properties   /* extended properties            */
 };
 
 GX_CONST GX_STUDIO_WIDGET window2_score_define =
@@ -145,21 +225,21 @@ GX_CONST GX_STUDIO_WIDGET window2_score_define =
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
     {8, 0, 239, 23},                         /* widget size                    */
-    GX_NULL,                                 /* no next widget                 */
+    &window2_spaceship_define,               /* next widget definition         */
     GX_NULL,                                 /* no child widgets               */ 
     offsetof(WINDOW2_CONTROL_BLOCK, window2_score), /* control block           */
     (void *) &window2_score_properties       /* extended properties            */
 };
 
-GX_CONST GX_STUDIO_WIDGET window2_sprite_define =
+GX_CONST GX_STUDIO_WIDGET window2_asteroid_1_define =
 {
-    "sprite",
+    "asteroid_1",
     GX_TYPE_SPRITE,                          /* widget type                    */
     asteroids_1,                             /* widget id                      */
     #if defined(GX_WIDGET_USER_DATA)
     0,                                       /* user data                      */
     #endif
-    GX_STYLE_BORDER_NONE|GX_STYLE_ENABLED,   /* style flags                    */
+    GX_STYLE_BORDER_NONE|GX_STYLE_TRANSPARENT|GX_STYLE_ENABLED,   /* style flags */
     GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
     sizeof(GX_SPRITE),                       /* control block size             */
     GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
@@ -167,11 +247,11 @@ GX_CONST GX_STUDIO_WIDGET window2_sprite_define =
     gx_studio_sprite_create,                 /* create function                */
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
-    {90, 112, 153, 175},                     /* widget size                    */
+    {105, 26, 136, 57},                      /* widget size                    */
     &window2_score_define,                   /* next widget definition         */
     GX_NULL,                                 /* no child widgets               */ 
-    offsetof(WINDOW2_CONTROL_BLOCK, window2_sprite), /* control block          */
-    (void *) &window2_sprite_properties      /* extended properties            */
+    offsetof(WINDOW2_CONTROL_BLOCK, window2_asteroid_1), /* control block      */
+    (void *) &window2_asteroid_1_properties  /* extended properties            */
 };
 
 GX_CONST GX_STUDIO_WIDGET window2_define =
@@ -192,7 +272,7 @@ GX_CONST GX_STUDIO_WIDGET window2_define =
     (UINT (*)(GX_WIDGET *, GX_EVENT *)) window2_handler, /* event function override */
     {0, 0, 239, 319},                        /* widget size                    */
     GX_NULL,                                 /* next widget                    */
-    &window2_sprite_define,                  /* child widget                   */
+    &window2_asteroid_1_define,              /* child widget                   */
     0,                                       /* control block                  */
     (void *) &window2_properties             /* extended properties            */
 };

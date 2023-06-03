@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy):  2. 6.2023   Time (hh:mm): 19:31                        */
+/*  Date (dd.mm.yyyy):  3. 6.2023   Time (hh:mm): 20:41                        */
 /*******************************************************************************/
 
 
@@ -25,11 +25,13 @@ extern   "C" {
 #define ID_WINDOW2 1
 #define asteroids_1 2
 #define ID_SCORE 3
-#define ID_WINDOW1 4
-#define ID_BUTTON 5
-#define ID_TITLE 6
-#define ID_RECORD_SCORE_TITLE 7
-#define ID_RECORD_SCORE 8
+#define spaceship 4
+#define asteroids_2 5
+#define ID_WINDOW1 6
+#define ID_BUTTON 7
+#define ID_TITLE 8
+#define ID_RECORD_SCORE_TITLE 9
+#define ID_RECORD_SCORE 10
 
 
 /* Define animation ids                                                        */
@@ -106,8 +108,10 @@ typedef struct
 typedef struct WINDOW2_CONTROL_BLOCK_STRUCT
 {
     GX_WINDOW_MEMBERS_DECLARE
-    GX_SPRITE window2_sprite;
+    GX_SPRITE window2_asteroid_1;
     GX_PROMPT window2_score;
+    GX_SPRITE window2_spaceship;
+    GX_SPRITE window2_asteroid_2;
 } WINDOW2_CONTROL_BLOCK;
 
 typedef struct WINDOW1_CONTROL_BLOCK_STRUCT
