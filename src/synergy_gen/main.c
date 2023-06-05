@@ -3,6 +3,8 @@
 #include "tx_api.h"
 
 extern void main_thread_create(void);
+extern void game_engine_thread_create(void);
+extern void spaceship_control_thread_create(void);
 
 uint32_t g_ssp_common_thread_count;
 bool g_ssp_common_initialized;
@@ -58,6 +60,8 @@ void tx_application_define(void *first_unused_memory)
     }
 
     main_thread_create ();
+    game_engine_thread_create ();
+    spaceship_control_thread_create ();
 
 #ifdef TX_USER_ENABLE_TRACE
 					TX_USER_ENABLE_TRACE;

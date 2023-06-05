@@ -656,4 +656,44 @@ Synergy Configuration
       Name: New Event Flags
       Symbol: g_touch_event_flags
       
+  Thread "Game Engine Thread"
+    Symbol: game_engine_thread
+    Name: Game Engine Thread
+    Stack size (bytes): 1024
+    Priority: 6
+    Auto start: Disabled
+    Time slicing interval (ticks): 10
+    
+    Object "control_queue Queue"
+      Name: Control Queue
+      Symbol: control_queue
+      Message Size (Words): 1
+      Queue Size (Bytes): 60
+      
+    Object "graphic_queue Queue"
+      Name: Graphic Queue
+      Symbol: graphic_queue
+      Message Size (Words): 1
+      Queue Size (Bytes): 60
+      
+  Thread "Spaceship Control Thread"
+    Symbol: spaceship_control_thread
+    Name: Spaceship Control Thread
+    Stack size (bytes): 1024
+    Priority: 6
+    Auto start: Enabled
+    Time slicing interval (ticks): 10
+    
+    Object "button_queue Queue"
+      Name: Button Queue
+      Symbol: button_queue
+      Message Size (Words): 1
+      Queue Size (Bytes): 32
+      
+    Object "touch_queue Queue"
+      Name: Touch Queue
+      Symbol: touch_queue
+      Message Size (Words): 1
+      Queue Size (Bytes): 32
+      
   Messaging

@@ -588,6 +588,46 @@
         <property id="rtos.threadx.object.flags.symbol" value="g_touch_event_flags"/>
       </object>
     </context>
+    <context id="rtos.threadx.thread.993963568">
+      <property id="_symbol" value="game_engine_thread"/>
+      <property id="rtos.threadx.thread.name" value="Game Engine Thread"/>
+      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.priority" value="6"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="10"/>
+      <object id="rtos.threadx.object.queue.2081554892">
+        <property id="rtos.threadx.object.queue.name" value="Control Queue"/>
+        <property id="rtos.threadx.object.queue.symbol" value="control_queue"/>
+        <property id="rtos.threadx.object.queue.msg_size" value="1"/>
+        <property id="rtos.threadx.object.queue.queue_size" value="60"/>
+      </object>
+      <object id="rtos.threadx.object.queue.129757762">
+        <property id="rtos.threadx.object.queue.name" value="Graphic Queue"/>
+        <property id="rtos.threadx.object.queue.symbol" value="graphic_queue"/>
+        <property id="rtos.threadx.object.queue.msg_size" value="1"/>
+        <property id="rtos.threadx.object.queue.queue_size" value="60"/>
+      </object>
+    </context>
+    <context id="rtos.threadx.thread.1272359014">
+      <property id="_symbol" value="spaceship_control_thread"/>
+      <property id="rtos.threadx.thread.name" value="Spaceship Control Thread"/>
+      <property id="rtos.threadx.thread.stack" value="1024"/>
+      <property id="rtos.threadx.thread.priority" value="6"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.timeslice" value="10"/>
+      <object id="rtos.threadx.object.queue.2002525441">
+        <property id="rtos.threadx.object.queue.name" value="Button Queue"/>
+        <property id="rtos.threadx.object.queue.symbol" value="button_queue"/>
+        <property id="rtos.threadx.object.queue.msg_size" value="1"/>
+        <property id="rtos.threadx.object.queue.queue_size" value="32"/>
+      </object>
+      <object id="rtos.threadx.object.queue.985355125">
+        <property id="rtos.threadx.object.queue.name" value="Touch Queue"/>
+        <property id="rtos.threadx.object.queue.symbol" value="touch_queue"/>
+        <property id="rtos.threadx.object.queue.msg_size" value="1"/>
+        <property id="rtos.threadx.object.queue.queue_size" value="32"/>
+      </object>
+    </context>
     <config id="config.driver.jpeg_decode">
       <property id="config.driver.jpeg_decode.param_checking_enable" value="config.driver.jpeg_decode.param_checking_enable.bsp"/>
     </config>

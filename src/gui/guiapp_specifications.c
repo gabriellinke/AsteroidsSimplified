@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy):  3. 6.2023   Time (hh:mm): 20:41                        */
+/*  Date (dd.mm.yyyy):  5. 6.2023   Time (hh:mm): 10:31                        */
 /*******************************************************************************/
 
 
@@ -130,7 +130,7 @@ GX_PROMPT_PROPERTIES window2_score_properties =
 GX_SPRITE_FRAME window2_spaceship_frame_list[1] =
 {
     {
-        GX_PIXELMAP_ID_NAVE,                 /* pixelmap id                    */
+        GX_PIXELMAP_ID_NAVE2,                /* pixelmap id                    */
         0,                                   /* x offset                       */
         0,                                   /* y offset                       */
         0,                                   /* frame delay                    */
@@ -201,7 +201,7 @@ GX_CONST GX_STUDIO_WIDGET window2_spaceship_define =
     gx_studio_sprite_create,                 /* create function                */
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
-    {112, 148, 127, 171},                    /* widget size                    */
+    {108, 148, 131, 171},                    /* widget size                    */
     &window2_asteroid_2_define,              /* next widget definition         */
     GX_NULL,                                 /* no child widgets               */ 
     offsetof(WINDOW2_CONTROL_BLOCK, window2_spaceship), /* control block       */
