@@ -536,11 +536,22 @@
       <property id="module.driver.spi.tei_ipl" value="board.icu.common.irq.priority3"/>
       <property id="module.driver.spi.eri_ipl" value="board.icu.common.irq.priority3"/>
     </module>
+    <module id="module.driver.external_irq_on_icu.85174517">
+      <property id="module.driver.external_irq.name" value="button_interrupt"/>
+      <property id="module.driver.external_irq.channel" value="11"/>
+      <property id="module.driver.external_irq.trigger" value="module.driver.external_irq.trigger.trig_rising"/>
+      <property id="module.driver.external_irq.filter_enable" value="module.driver.external_irq.filter_enable.false"/>
+      <property id="module.driver.external_irq.pclk_div" value="module.driver.external_irq.pclk_div.pclk_div_by_64"/>
+      <property id="module.driver.external_irq.interrupt_enable" value="module.driver.external_irq.interrupt_enable.true"/>
+      <property id="module.driver.external_irq.p_callback" value="button_callback"/>
+      <property id="module.driver.external_irq.irq_ipl" value="board.icu.common.irq.priority5"/>
+    </module>
     <context id="_hal.0">
       <stack module="module.driver.cgc_on_cgc.0"/>
       <stack module="module.driver.fmi_on_fmi.0"/>
       <stack module="module.driver.elc_on_elc.0"/>
       <stack module="module.driver.ioport_on_ioport.0"/>
+      <stack module="module.driver.external_irq_on_icu.85174517"/>
     </context>
     <context id="rtos.threadx.thread.1143675637">
       <property id="_symbol" value="main_thread"/>
@@ -660,7 +671,7 @@
       <property id="config.framework.sf_i2c_v2.param_checking_enable" value="config.framework.sf_i2c_v2.param_checking_enable.enabled"/>
     </config>
     <config id="config.driver.icu">
-      <property id="config.driver.icu.param_checking_enable" value="config.driver.icu.param_checking_enable.enabled"/>
+      <property id="config.driver.icu.param_checking_enable" value="config.driver.icu.param_checking_enable.bsp"/>
     </config>
     <config id="config.driver.fmi">
       <property id="config.driver.fmi.param_checking_enable" value="config.driver.fmi.param_checking_enable.bsp"/>

@@ -273,7 +273,7 @@ Synergy Configuration
     Parameter Checking: Enabled
     
   Module "External IRQ Driver on r_icu"
-    Parameter Checking: Enabled
+    Parameter Checking: Default (BSP)
     
   Module "I2C Master Driver on r_riic"
     Parameter Checking: Enabled
@@ -321,6 +321,16 @@ Synergy Configuration
       
     Instance "g_ioport I/O Port Driver on r_ioport"
       Name [Fixed]: g_ioport
+      
+    Instance "button_interrupt External IRQ Driver on r_icu"
+      Name: button_interrupt
+      Channel: 11
+      Trigger: Rising
+      Digital Filtering: Disabled
+      Digital Filtering Sample Clock (Only valid when Digital Filtering is Enabled): PCLK / 64
+      Interrupt enabled after initialization: True
+      Callback: button_callback
+      Pin Interrupt Priority: Priority 5
       
   Thread "Main_Thread"
     Symbol: main_thread
