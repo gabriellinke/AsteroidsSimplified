@@ -2,6 +2,7 @@
 #include "gui/guiapp_specifications.h"
 
 #include "main_thread.h"
+#include "spaceship_control_thread.h"
 
 extern TX_THREAD game_engine_thread;
 extern TX_THREAD spaceship_control_thread;
@@ -10,6 +11,7 @@ extern GX_WINDOW_ROOT * p_window_root;
 static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old);
 void updateDraw();
 void updateSpaceShip();
+void sendPressedPosition(GX_EVENT *event_ptr);
 
 UINT window1_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
 {
@@ -37,6 +39,7 @@ UINT window2_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
 
         case GX_EVENT_PEN_UP:
             // Se a tela tiver sido pressionada atualiza a nave
+            sendPressedPosition(event_ptr);
             updateSpaceShip();
             break;
         case GX_EVENT_TIMER:
@@ -90,8 +93,7 @@ static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old
 */
 void updateDraw() {
     GX_WIDGET *widget_found;
-    int status;
-    status = gx_system_widget_find(asteroids_1, GX_SEARCH_DEPTH_INFINITE, &widget_found);
+    UINT status = gx_system_widget_find(asteroids_1, GX_SEARCH_DEPTH_INFINITE, &widget_found);
     status = gx_widget_shift(widget_found, 0, 2, GX_TRUE );
 }
 
@@ -99,7 +101,18 @@ void updateDraw() {
 */
 void updateSpaceShip() {
     GX_WIDGET *widget_found;
-    int status;
-    status = gx_system_widget_find(asteroids_1, GX_SEARCH_DEPTH_INFINITE, &widget_found);
+    UINT status = gx_system_widget_find(asteroids_1, GX_SEARCH_DEPTH_INFINITE, &widget_found);
     status = gx_widget_shift(widget_found, 0, -50, GX_TRUE );
 }
+
+void sendPressedPosition(GX_EVENT *event_ptr) {
+    GX_VALUE x = event_ptr->gx_event_payload.gx_event_pointdata.gx_point_x;
+    GX_VALUE y = event_ptr->gx_event_payload.gx_event_pointdata.gx_point_y;
+
+    // b31-b30 = 10 / b29-b15 = x / b14-b0 = y
+    UINT coord  = (1 << 31) | (0 << 30) | (x << 15) | y;
+
+    UINT status = tx_queue_send(&touch_queue, &coord, TX_NO_WAIT);
+    if(status) printf("\nError sending shot message to touch_queue. Err %d", status);
+}
+

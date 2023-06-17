@@ -11,15 +11,10 @@ ULONG TIMER_TICKS = ceil(100/6); // 1 second / 6
 TX_TIMER button_timer;
 int button_timer_expired = 1;
 
-enum EventType {
-    SHOT = 0,
-    MOVE = 1
-};
-
 /* Spaceship Control Thread entry function */
 void spaceship_control_thread_entry(void)
 {
-    ULONG message;
+    UINT status_button, status_touch, button_message, touch_message;
 
     initialise_monitor_handles(); //Used for printf outputs
     /* Initialize button interruption */
@@ -32,8 +27,9 @@ void spaceship_control_thread_entry(void)
 
     while (1)
     {
-        UINT status = tx_queue_receive(&button_queue, &message, TX_WAIT_FOREVER);
-        if(!status) {
+        status_touch = tx_queue_receive(&touch_queue, &touch_message, 1);
+        status_button = tx_queue_receive(&button_queue, &button_message, 1);
+        if(!status_button) {
             printf("\nBotão apertado\n");
             if(button_timer_expired) {
                 printf("\tDisparo válido\n");
@@ -42,15 +38,14 @@ void spaceship_control_thread_entry(void)
                 if(timer_status) printf("\nError restarting timer: %d", timer_status);
                 timer_status = tx_timer_activate(&button_timer);
                 if(timer_status) printf("\nError restarting timer: %d", timer_status);
-                // TODO: Send message in QUEUE
-                message = SHOT;
-                UINT status = tx_queue_send(&control_queue, &message, TX_NO_WAIT);
+                UINT status = tx_queue_send(&control_queue, &button_message, TX_NO_WAIT);
                 if(status) printf("\nError sending shot message to control queue. Err %d", status);
             }
-        } else {
-            printf("\nError: %d", status);
         }
-
+        if(!status_touch) {
+            UINT status = tx_queue_send(&control_queue, &touch_message, TX_NO_WAIT);
+            if(status) printf("\nError sending shot message to control queue. Err %d", status);
+        }
     }
 }
 
@@ -62,3 +57,5 @@ void button_callback(external_irq_callback_args_t *p_args) {
 void button_timer_callback() {
     button_timer_expired = 1;
 }
+
+
