@@ -691,7 +691,7 @@ Synergy Configuration
     Name: Spaceship Control Thread
     Stack size (bytes): 1024
     Priority: 6
-    Auto start: Enabled
+    Auto start: Disabled
     Time slicing interval (ticks): 10
     
     Object "button_queue Queue"

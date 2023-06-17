@@ -3,6 +3,8 @@
 
 #include "main_thread.h"
 
+extern TX_THREAD game_engine_thread;
+extern TX_THREAD spaceship_control_thread;
 extern GX_WINDOW_ROOT * p_window_root;
 
 static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old);
@@ -53,6 +55,10 @@ static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old
     UINT err = GX_SUCCESS;
 
     // TODO: verificar se tá indo pra tela 2. Se sim, inicia timer. Se tiver indo pra tela 1, desliga timer.
+    // TODO: Também iniciar / parar threads
+    UINT status = tx_thread_resume(&game_engine_thread);
+    status = tx_thread_resume(&spaceship_control_thread);
+
     gx_system_timer_start(p_new, 1, 2, 2);
 
     if (!p_new->gx_widget_parent)

@@ -624,7 +624,7 @@
       <property id="rtos.threadx.thread.name" value="Spaceship Control Thread"/>
       <property id="rtos.threadx.thread.stack" value="1024"/>
       <property id="rtos.threadx.thread.priority" value="6"/>
-      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.enabled"/>
+      <property id="rtos.threadx.thread.autostart" value="rtos.threadx.thread.autostart.disabled"/>
       <property id="rtos.threadx.thread.timeslice" value="10"/>
       <object id="rtos.threadx.object.queue.2002525441">
         <property id="rtos.threadx.object.queue.name" value="Button Queue"/>

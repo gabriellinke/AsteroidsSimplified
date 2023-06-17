@@ -39,7 +39,7 @@ void spaceship_control_thread_create(void)
     UINT err;
     err = tx_thread_create (&spaceship_control_thread, (CHAR*) "Spaceship Control Thread",
                             spaceship_control_thread_func, (ULONG) NULL, &spaceship_control_thread_stack, 1024, 6, 6,
-                            10, TX_AUTO_START);
+                            10, TX_DONT_START);
     if (TX_SUCCESS != err)
     {
         tx_startup_err_callback (&spaceship_control_thread, 0);
