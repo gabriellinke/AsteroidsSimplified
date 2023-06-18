@@ -10,20 +10,34 @@
 
 ULONG points = 0;
 INT angle = 0;
+INT x1 = 20, x2 = 200;
+INT y1 = 20, y2 = 280;
 /* Game Engine Thread entry function */
 void game_engine_thread_entry(void)
 {
     ULONG message, status;
     while (1)
     {
-
         status = tx_queue_receive(&control_queue, &message, TX_WAIT_FOREVER);
         if(GX_SUCCESS != status) __BKPT(0);
         if(message >> 30 == 0x0) {
             points += 10;
-            ULONG update_score_message = 5 << 18 | points;
+            ULONG update_score_message = 4 << 18 | points;
             status = tx_queue_send(&graphic_queue, &update_score_message, TX_NO_WAIT);
             if(GX_SUCCESS != status) __BKPT(0);
+
+            ULONG test = 2 << 18 | x1 << 9 | y1;
+            status = tx_queue_send(&graphic_queue, &test, TX_NO_WAIT);
+            if(GX_SUCCESS != status) __BKPT(0);
+            test = 3 << 18 | x2 << 9 | y2;
+            status = tx_queue_send(&graphic_queue, &test, TX_NO_WAIT);
+            if(GX_SUCCESS != status) __BKPT(0);
+
+            x1+=2;
+            y1+=2;
+            x2-=2;
+            y2-=2;
+
         } else {
             UINT coord = message;
             // Extract the values from the bits

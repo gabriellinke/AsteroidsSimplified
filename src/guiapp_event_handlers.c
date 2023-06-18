@@ -17,6 +17,8 @@ void updateDraw(GX_WINDOW *widget);
 void updateSpaceShip();
 void updateAsteroid();
 void sendPressedPosition(GX_EVENT *event_ptr);
+void updateBigAsteroid(int coords);
+void updateSmallAsteroid(int coords);
 
 char buffer[12] = "0";
 
@@ -116,22 +118,18 @@ void updateDraw(GX_WINDOW *widget) {
 
 
 
-
-/*
-    GX_WIDGET *widget_found;
-    UINT status = gx_system_widget_find(asteroids_1, GX_SEARCH_DEPTH_INFINITE, &widget_found);
-    if(GX_SUCCESS != status) __BKPT(0);
-    status = gx_widget_shift(widget_found, 0, 2, GX_TRUE);
-    if(GX_SUCCESS != status) __BKPT(0);
-*/
     ULONG message;
-    UINT status = tx_queue_receive(&graphic_queue, &message, 1);
-    //if(GX_SUCCESS != status) __BKPT(0);
+    UINT status;
 
-    if(message >> 18 == 5) updateScore(message & 0x0003FFFF);
-    if(message >> 18 == 0) updateSpaceShip(message & 0x0003FFFF);
+    do {
+        status = tx_queue_receive(&graphic_queue, &message, TX_NO_WAIT);
+        if(message >> 18 == 4) updateScore(message & 0x0003FFFF);
+        if(message >> 18 == 0) updateSpaceShip(message & 0x0003FFFF);
+        if(message >> 18 == 2) updateBigAsteroid(message & 0x0003FFFF);
+        if(message >> 18 == 3) updateSmallAsteroid(message & 0x0003FFFF);
+    } while(TX_SUCCESS  == status);
 
-
+    if(TX_QUEUE_EMPTY != status) __BKPT(0);
 
 
 
@@ -150,6 +148,42 @@ void updateSpaceShip(int angle) {
 
     /* Draw the rotated pixelpmap */
     result = gx_canvas_pixelmap_rotate(108, 148, lp_pxmap, angle, -1, -1);                // only draws a rotated pixelmap, the source pixelmap is not changed;
+    if(TX_SUCCESS != result) __BKPT(0);
+}
+
+void updateBigAsteroid(int coords) {
+    int COORD_Y_MASK = 0x1FF;
+    int COORD_X_MASK = 0x1FF00;
+    int x = (coords & COORD_X_MASK) >> 9;
+    int y = (coords & COORD_Y_MASK);
+
+
+    GX_PIXELMAP * lp_pxmap;
+    UINT result;
+    /* Get a pointer of the pixelmap resource */
+    result = gx_context_pixelmap_get(GX_PIXELMAP_ID_ASTEROIDE3, &lp_pxmap);
+    if(TX_SUCCESS != result) __BKPT(0);
+
+    /* Draw the rotated pixelpmap */
+    result = gx_canvas_pixelmap_draw(x, y, lp_pxmap);
+    if(TX_SUCCESS != result) __BKPT(0);
+}
+
+void updateSmallAsteroid(int coords) {
+    int COORD_Y_MASK = 0x1FF;
+    int COORD_X_MASK = 0x1FF00;
+    int x = (coords & COORD_X_MASK) >> 9;
+    int y = (coords & COORD_Y_MASK);
+
+
+    GX_PIXELMAP * lp_pxmap;
+    UINT result;
+    /* Get a pointer of the pixelmap resource */
+    result = gx_context_pixelmap_get(GX_PIXELMAP_ID_ASTEROIDE2, &lp_pxmap);
+    if(TX_SUCCESS != result) __BKPT(0);
+
+    /* Draw the rotated pixelpmap */
+    result = gx_canvas_pixelmap_draw(x, y, lp_pxmap);
     if(TX_SUCCESS != result) __BKPT(0);
 }
 
