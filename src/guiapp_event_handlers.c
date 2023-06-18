@@ -1,17 +1,23 @@
 #include "gui/guiapp_resources.h"
 #include "gui/guiapp_specifications.h"
+#include <string.h>
+#include <stdio.h>
 
 #include "main_thread.h"
 #include "spaceship_control_thread.h"
+#include "game_engine_thread.h"
 
 extern TX_THREAD game_engine_thread;
 extern TX_THREAD spaceship_control_thread;
 extern GX_WINDOW_ROOT * p_window_root;
 
 static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old);
+void updateScore(UINT score);
 void updateDraw();
 void updateSpaceShip();
 void sendPressedPosition(GX_EVENT *event_ptr);
+
+char buffer[12] = "0";
 
 UINT window1_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
 {
@@ -94,7 +100,11 @@ static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old
 void updateDraw() {
     GX_WIDGET *widget_found;
     UINT status = gx_system_widget_find(asteroids_1, GX_SEARCH_DEPTH_INFINITE, &widget_found);
-    status = gx_widget_shift(widget_found, 0, 2, GX_TRUE );
+    status = gx_widget_shift(widget_found, 0, 2, GX_TRUE);
+
+    ULONG message;
+    status = tx_queue_receive(&graphic_queue, &message, 1);
+    if(message >> 18 == 5) updateScore(message);
 }
 
 /* TODO: função deverá atualizar a orientação da nave
@@ -116,3 +126,16 @@ void sendPressedPosition(GX_EVENT *event_ptr) {
     if(status) printf("\nError sending shot message to touch_queue. Err %d", status);
 }
 
+void updateScore(UINT score) {
+    GX_WIDGET *widget_found;
+
+    snprintf(buffer, sizeof(buffer), "%d", score & 0x0003FFFF);
+    GX_STRING new_string;
+    new_string.gx_string_ptr = buffer;
+    new_string.gx_string_length = strlen(new_string.gx_string_ptr);
+
+    // Update score
+    UINT status = gx_system_widget_find(ID_SCORE, GX_SEARCH_DEPTH_INFINITE, &widget_found);
+    status = gx_prompt_text_set_ext((GX_PROMPT *)widget_found, &new_string);
+    status = gx_system_dirty_mark(widget_found);
+}

@@ -6,7 +6,7 @@
 /*  Studio User Guide, or visit our web site at azure.com/rtos                 */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy):  5. 6.2023   Time (hh:mm): 10:31                        */
+/*  Date (dd.mm.yyyy): 17. 6.2023   Time (hh:mm): 22:38                        */
 /*******************************************************************************/
 
 
@@ -2053,17 +2053,19 @@ GX_CONST GX_UBYTE display_1_BUTTON_STRING_English[] = "New game";
 GX_CONST GX_UBYTE display_1_TITLE_English[] = "Asteroids Simplified";
 GX_CONST GX_UBYTE display_1_RECORD_SCORE_English[] = "1550";
 GX_CONST GX_UBYTE display_1_SCORE_English[] = "650";
+GX_CONST GX_UBYTE display_1_STRING_1_English[] = "0";
 
 /* String Table for display_1 language English                                 */
 
-GX_CONST GX_UBYTE *display_1_English_string_table[6] =
+GX_CONST GX_UBYTE *display_1_English_string_table[7] =
 {
     GX_NULL,
     display_1_RECORD_SCORE_TITLE_English,
     display_1_BUTTON_STRING_English,
     display_1_TITLE_English,
     display_1_RECORD_SCORE_English,
-    display_1_SCORE_English
+    display_1_SCORE_English,
+    display_1_STRING_1_English
 
 };
 

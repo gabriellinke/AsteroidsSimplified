@@ -1,10 +1,10 @@
 #include "game_engine_thread.h"
 #include <stdio.h>
+int points = 0;
 /* Game Engine Thread entry function */
 void game_engine_thread_entry(void)
 {
     ULONG message, status;
-    /* TODO: add your own code here */
     while (1)
     {
 
@@ -13,6 +13,9 @@ void game_engine_thread_entry(void)
         else printf("\nMessage received from control queue: %lu\n", message);
         if(message >> 30 == 0x0) {
             printf("\nShot\n");
+            points += 10;
+            ULONG update_score_message = 5 << 18 | points;
+            UINT status = tx_queue_send(&graphic_queue, &update_score_message, TX_NO_WAIT);
         } else {
             UINT coord = message;
             // Extract the values from the bits

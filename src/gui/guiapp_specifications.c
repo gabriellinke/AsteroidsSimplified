@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy):  5. 6.2023   Time (hh:mm): 10:31                        */
+/*  Date (dd.mm.yyyy): 17. 6.2023   Time (hh:mm): 22:38                        */
 /*******************************************************************************/
 
 
@@ -122,7 +122,7 @@ GX_SPRITE_PROPERTIES window2_asteroid_1_properties =
 };
 GX_PROMPT_PROPERTIES window2_score_properties =
 {
-    GX_STRING_ID_SCORE,                      /* string id                      */
+    GX_STRING_ID_STRING_1,                   /* string id                      */
     GX_FONT_ID_PROMPT,                       /* font id                        */
     GX_COLOR_ID_WHITE,                       /* normal text color              */
     GX_COLOR_ID_WHITE                        /* selected text color            */
