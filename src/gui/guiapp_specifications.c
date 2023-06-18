@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy): 18. 6.2023   Time (hh:mm): 14:07                        */
+/*  Date (dd.mm.yyyy): 18. 6.2023   Time (hh:mm): 14:37                        */
 /*******************************************************************************/
 
 
@@ -268,7 +268,7 @@ GX_CONST GX_STUDIO_WIDGET window2_define =
     GX_COLOR_ID_BLACK,                       /* normal color id                */
     GX_COLOR_ID_BLACK,                       /* selected color id              */
     gx_studio_window_create,                 /* create function                */
-    (VOID (*)(GX_WIDGET *)) window2_draw,    /* drawing function override      */
+    GX_NULL,                                 /* drawing function override      */
     (UINT (*)(GX_WIDGET *, GX_EVENT *)) window2_handler, /* event function override */
     {0, 0, 239, 319},                        /* widget size                    */
     GX_NULL,                                 /* next widget                    */

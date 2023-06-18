@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy): 18. 6.2023   Time (hh:mm): 14:07                        */
+/*  Date (dd.mm.yyyy): 18. 6.2023   Time (hh:mm): 14:37                        */
 /*******************************************************************************/
 
 
@@ -193,7 +193,6 @@ VOID _gx_synergy_jpeg_draw (GX_DRAW_CONTEXT *p_context, INT x, INT y, GX_PIXELMA
 /* Declare event process functions, draw functions, and callback functions     */
 
 UINT window2_handler(GX_WINDOW *widget, GX_EVENT *event_ptr);
-VOID window2_draw(GX_WINDOW *widget);
 UINT window1_handler(GX_WINDOW *widget, GX_EVENT *event_ptr);
 
 /* Declare the GX_STUDIO_DISPLAY_INFO structure                                */

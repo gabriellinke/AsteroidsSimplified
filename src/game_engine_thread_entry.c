@@ -1,6 +1,7 @@
 #include "game_engine_thread.h"
 #include <stdio.h>
 int points = 0;
+int angle = 0;
 /* Game Engine Thread entry function */
 void game_engine_thread_entry(void)
 {
@@ -27,6 +28,10 @@ void game_engine_thread_entry(void)
                 printf("%u", bit);
             }
             printf("\n");
+
+            angle += 10;
+            ULONG update_spaceship_message = 0 << 18 | angle;
+            UINT status = tx_queue_send(&graphic_queue, &update_spaceship_message, TX_NO_WAIT);
         }
     }
 }
