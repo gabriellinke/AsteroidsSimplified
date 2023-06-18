@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy): 17. 6.2023   Time (hh:mm): 22:38                        */
+/*  Date (dd.mm.yyyy): 18. 6.2023   Time (hh:mm): 14:07                        */
 /*******************************************************************************/
 
 
@@ -25,8 +25,8 @@ extern   "C" {
 #define ID_WINDOW2 1
 #define asteroids_1 2
 #define ID_SCORE 3
-#define spaceship 4
-#define asteroids_2 5
+#define asteroids_2 4
+#define spaceship 5
 #define ID_WINDOW1 6
 #define ID_BUTTON 7
 #define ID_TITLE 8
@@ -110,8 +110,8 @@ typedef struct WINDOW2_CONTROL_BLOCK_STRUCT
     GX_WINDOW_MEMBERS_DECLARE
     GX_SPRITE window2_asteroid_1;
     GX_PROMPT window2_score;
-    GX_SPRITE window2_spaceship;
     GX_SPRITE window2_asteroid_2;
+    GX_SPRITE window2_spaceship;
 } WINDOW2_CONTROL_BLOCK;
 
 typedef struct WINDOW1_CONTROL_BLOCK_STRUCT
@@ -193,6 +193,7 @@ VOID _gx_synergy_jpeg_draw (GX_DRAW_CONTEXT *p_context, INT x, INT y, GX_PIXELMA
 /* Declare event process functions, draw functions, and callback functions     */
 
 UINT window2_handler(GX_WINDOW *widget, GX_EVENT *event_ptr);
+VOID window2_draw(GX_WINDOW *widget);
 UINT window1_handler(GX_WINDOW *widget, GX_EVENT *event_ptr);
 
 /* Declare the GX_STUDIO_DISPLAY_INFO structure                                */

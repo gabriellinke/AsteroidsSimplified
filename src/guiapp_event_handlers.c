@@ -17,6 +17,7 @@ void updateDraw();
 void updateSpaceShip();
 void sendPressedPosition(GX_EVENT *event_ptr);
 
+int angle = 0;
 char buffer[12] = "0";
 
 UINT window1_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
@@ -105,6 +106,11 @@ void updateDraw() {
     ULONG message;
     status = tx_queue_receive(&graphic_queue, &message, 1);
     if(message >> 18 == 5) updateScore(message);
+
+   /* UINT status = gx_system_widget_find(spaceship, GX_SEARCH_DEPTH_INFINITE, &widget_found);
+    gx_utility_pixelmap_rotate();
+    widget_found.gx_widget_rotation_angle = 90;
+    status = gx_system_dirty_mark(widget_found);*/
 }
 
 /* TODO: função deverá atualizar a orientação da nave
@@ -138,4 +144,21 @@ void updateScore(UINT score) {
     UINT status = gx_system_widget_find(ID_SCORE, GX_SEARCH_DEPTH_INFINITE, &widget_found);
     status = gx_prompt_text_set_ext((GX_PROMPT *)widget_found, &new_string);
     status = gx_system_dirty_mark(widget_found);
+}
+
+VOID window2_draw(GX_WINDOW *widget) {
+    UINT result;
+    GX_PIXELMAP * lp_pxmap;
+
+    /* Draw the specified window */
+    gx_window_draw(widget);
+
+    /* Get a pointer of the pixelmap resource */
+    result = gx_context_pixelmap_get(GX_PIXELMAP_ID_NAVE2, &lp_pxmap);
+    if(TX_SUCCESS != result) __BKPT(0);
+
+    /* Draw the rotated pixelpmap */
+    angle++;
+    result = gx_canvas_pixelmap_rotate(108, 148, lp_pxmap, angle, -1, -1);                // only draws a rotated pixelmap, the source pixelmap is not changed;
+    if(TX_SUCCESS != result) __BKPT(0);
 }
