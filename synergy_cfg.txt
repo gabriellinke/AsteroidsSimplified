@@ -686,6 +686,10 @@ Synergy Configuration
       Message Size (Words): 1
       Queue Size (Bytes): 60
       
+    Object "event_flags Event Flags"
+      Name: Sync Event Flags
+      Symbol: event_flags
+      
   Thread "Spaceship Control Thread"
     Symbol: spaceship_control_thread
     Name: Spaceship Control Thread

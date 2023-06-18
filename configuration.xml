@@ -618,6 +618,10 @@
         <property id="rtos.threadx.object.queue.msg_size" value="1"/>
         <property id="rtos.threadx.object.queue.queue_size" value="60"/>
       </object>
+      <object id="rtos.threadx.object.flags.377250082">
+        <property id="rtos.threadx.object.flags.name" value="Sync Event Flags"/>
+        <property id="rtos.threadx.object.flags.symbol" value="event_flags"/>
+      </object>
     </context>
     <context id="rtos.threadx.thread.1272359014">
       <property id="_symbol" value="spaceship_control_thread"/>

@@ -7,6 +7,9 @@
 #include "spaceship_control_thread.h"
 #include "game_engine_thread.h"
 
+#define FLAG0 (1 << 0)
+#define FLAG1 (1 << 1)
+
 extern TX_THREAD game_engine_thread;
 extern TX_THREAD spaceship_control_thread;
 extern GX_WINDOW_ROOT * p_window_root;
@@ -14,8 +17,7 @@ extern GX_WINDOW_ROOT * p_window_root;
 static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old);
 void updateScore(UINT score);
 void updateDraw(GX_WINDOW *widget);
-void updateSpaceShip();
-void updateAsteroid();
+void updateSpaceShip(int angle);
 void sendPressedPosition(GX_EVENT *event_ptr);
 void updateBigAsteroid(int coords);
 void updateSmallAsteroid(int coords);
@@ -46,17 +48,20 @@ UINT window1_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
 UINT window2_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
 {
     UINT result = gx_window_event_process(widget, event_ptr);
+    ULONG flag;
 
     switch (event_ptr->gx_event_type){
 
         case GX_EVENT_PEN_UP:
             // Se a tela tiver sido pressionada atualiza a nave
             sendPressedPosition(event_ptr);
-            //updateAsteroid();
             break;
         case GX_EVENT_TIMER:
+            result = tx_event_flags_get(&event_flags, FLAG1, TX_OR_CLEAR, &flag, TX_WAIT_FOREVER);
+            if(TX_SUCCESS != result) __BKPT(0);
             // Cada vez que o timer estourar atualiza a tela
             updateDraw(widget);
+            tx_event_flags_set(&event_flags, FLAG0, TX_OR);
             break;
         default:
             result = gx_window_event_process(widget, event_ptr);
@@ -185,14 +190,6 @@ void updateSmallAsteroid(int coords) {
     /* Draw the rotated pixelpmap */
     result = gx_canvas_pixelmap_draw(x, y, lp_pxmap);
     if(TX_SUCCESS != result) __BKPT(0);
-}
-
-void updateAsteroid() {
-    GX_WIDGET *widget_found;
-    UINT status = gx_system_widget_find(asteroids_1, GX_SEARCH_DEPTH_INFINITE, &widget_found);
-    if(GX_SUCCESS != status) __BKPT(0);
-    status = gx_widget_shift(widget_found, 0, -50, GX_TRUE );
-    if(GX_SUCCESS != status) __BKPT(0);
 }
 
 void sendPressedPosition(GX_EVENT *event_ptr) {
