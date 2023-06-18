@@ -50,7 +50,7 @@ UINT window2_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
         case GX_EVENT_PEN_UP:
             // Se a tela tiver sido pressionada atualiza a nave
             sendPressedPosition(event_ptr);
-            updateAsteroid();
+            //updateAsteroid();
             break;
         case GX_EVENT_TIMER:
             // Cada vez que o timer estourar atualiza a tela
@@ -70,7 +70,9 @@ static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old
     // TODO: verificar se tá indo pra tela 2. Se sim, inicia timer. Se tiver indo pra tela 1, desliga timer.
     // TODO: Também iniciar / parar threads
     UINT status = tx_thread_resume(&game_engine_thread);
+    if(GX_SUCCESS != status) __BKPT(0);
     status = tx_thread_resume(&spaceship_control_thread);
+    if(GX_SUCCESS != status) __BKPT(0);
 
     gx_system_timer_start(p_new, 1, 2, 2);
 
@@ -115,13 +117,17 @@ void updateDraw(GX_WINDOW *widget) {
 
 
 
-
+/*
     GX_WIDGET *widget_found;
     UINT status = gx_system_widget_find(asteroids_1, GX_SEARCH_DEPTH_INFINITE, &widget_found);
+    if(GX_SUCCESS != status) __BKPT(0);
     status = gx_widget_shift(widget_found, 0, 2, GX_TRUE);
-
+    if(GX_SUCCESS != status) __BKPT(0);
+*/
     ULONG message;
-    status = tx_queue_receive(&graphic_queue, &message, 1);
+    UINT status = tx_queue_receive(&graphic_queue, &message, 1);
+    //if(GX_SUCCESS != status) __BKPT(0);
+
     if(message >> 18 == 5) updateScore(message & 0x0003FFFF);
     if(message >> 18 == 0) updateSpaceShip(message & 0x0003FFFF);
 
@@ -150,7 +156,9 @@ void updateSpaceShip(int angle) {
 void updateAsteroid() {
     GX_WIDGET *widget_found;
     UINT status = gx_system_widget_find(asteroids_1, GX_SEARCH_DEPTH_INFINITE, &widget_found);
+    if(GX_SUCCESS != status) __BKPT(0);
     status = gx_widget_shift(widget_found, 0, -50, GX_TRUE );
+    if(GX_SUCCESS != status) __BKPT(0);
 }
 
 void sendPressedPosition(GX_EVENT *event_ptr) {
@@ -161,7 +169,7 @@ void sendPressedPosition(GX_EVENT *event_ptr) {
     UINT coord  = (1 << 31) | (0 << 30) | (x << 15) | y;
 
     UINT status = tx_queue_send(&touch_queue, &coord, TX_NO_WAIT);
-    if(status) printf("\nError sending shot message to touch_queue. Err %d", status);
+    if(GX_SUCCESS != status) __BKPT(0);
 }
 
 void updateScore(UINT score) {
@@ -174,6 +182,9 @@ void updateScore(UINT score) {
 
     // Update score
     UINT status = gx_system_widget_find(ID_SCORE, GX_SEARCH_DEPTH_INFINITE, &widget_found);
+    if(GX_SUCCESS != status) __BKPT(0);
     status = gx_prompt_text_set_ext((GX_PROMPT *)widget_found, &new_string);
+    if(GX_SUCCESS != status) __BKPT(0);
     status = gx_system_dirty_mark(widget_found);
+    if(GX_SUCCESS != status) __BKPT(0);
 }
