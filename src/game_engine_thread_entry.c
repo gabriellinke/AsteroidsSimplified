@@ -3,8 +3,8 @@
 #include <math.h>
 
 #define x_0 120
-#define y_0 180
-#define y_max 360
+#define y_0 160
+#define y_max 320
 #define x_max 240
 #define PI 3.14159
 
@@ -13,8 +13,9 @@
 
 ULONG points = 0;
 INT angle = 0;
-INT x1 = 20, x2 = 200;
-INT y1 = 20, y2 = 280;
+INT x1 = 20, x2 = 200, y1 = 20, y2 = 280;
+
+INT x3, y3, dx, dy, bullet = 0;
 
 
 void updateScoreGraphics();
@@ -23,6 +24,7 @@ void updateAsteroidsGraphics();
 void calculateSpaceshipAimAngle(UINT coord);
 void getInputs();
 void updateGame();
+void shotBullet();
 
 /* Game Engine Thread entry function */
 void game_engine_thread_entry(void)
@@ -84,6 +86,7 @@ void getInputs() {
         if(message >> 30 == 0x0) {
             points += 10;
             updateScoreGraphics();
+            shotBullet();
         } else {
             calculateSpaceshipAimAngle(message);
             updateSpaceshipGraphics();
@@ -95,6 +98,16 @@ void getInputs() {
 }
 
 void updateGame() {
+    x1+=1;
+    y1+=1;
+    x2-=1;
+    y2-=1;
+
+    if(bullet) {
+        x3 += dx;
+        y3 += dy;
+    }
+
     ULONG message, status;
     ULONG test = 2 << 18 | x1 << 9 | y1;
     status = tx_queue_send(&graphic_queue, &test, TX_NO_WAIT);
@@ -102,9 +115,15 @@ void updateGame() {
     test = 3 << 18 | x2 << 9 | y2;
     status = tx_queue_send(&graphic_queue, &test, TX_NO_WAIT);
     if(TX_SUCCESS != status) __BKPT(0);
+    test = 1 << 18 | x3 << 9 | y3;
+    status = tx_queue_send(&graphic_queue, &test, TX_NO_WAIT);
+    if(TX_SUCCESS != status) __BKPT(0);
+}
 
-    x1+=1;
-    y1+=1;
-    x2-=1;
-    y2-=1;
+void shotBullet() {
+    bullet = 1;
+    x3 = x_0 +12;
+    y3 = y_0 - 12;
+    dx = 0;
+    dy = -4;
 }

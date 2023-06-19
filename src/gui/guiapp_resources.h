@@ -6,7 +6,7 @@
 /*  Studio User Guide, or visit our web site at azure.com/rtos                 */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy): 18. 6.2023   Time (hh:mm): 16:08                        */
+/*  Date (dd.mm.yyyy): 19. 6.2023   Time (hh:mm): 09:10                        */
 /*******************************************************************************/
 
 
@@ -84,7 +84,8 @@
 #define GX_PIXELMAP_ID_ASTEROIDE4 8
 #define GX_PIXELMAP_ID_NAVE 9
 #define GX_PIXELMAP_ID_NAVE2 10
-#define DISPLAY_1_PIXELMAP_TABLE_SIZE 11
+#define GX_PIXELMAP_ID_PROJETIL 11
+#define DISPLAY_1_PIXELMAP_TABLE_SIZE 12
 
 /* String Ids                                                                  */
 

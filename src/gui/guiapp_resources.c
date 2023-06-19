@@ -6,7 +6,7 @@
 /*  Studio User Guide, or visit our web site at azure.com/rtos                 */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy): 18. 6.2023   Time (hh:mm): 16:08                        */
+/*  Date (dd.mm.yyyy): 19. 6.2023   Time (hh:mm): 09:10                        */
 /*******************************************************************************/
 
 
@@ -916,6 +916,28 @@ GX_CONST GX_PIXELMAP DISPLAY_1_THEME_1_NAVE2_pixelmap =
     24                                       /* height in pixel                */
 };
 
+/* THEME_1_PROJETIL pixelmap data                                              */
+
+static GX_CONST UINT DISPLAY_1_THEME_1_PROJETIL_pixelmap_data[9] =
+{
+    0xfff8fcf8, 0xfff8fcf8, 0xfff8fcf8, 0xfff8fcf8, 0xfff8fcf8, 0xfff8fcf8, 0xfff8fcf8, 
+    0xfff8fcf8, 0xfff8fcf8
+};
+GX_CONST GX_PIXELMAP DISPLAY_1_THEME_1_PROJETIL_pixelmap =
+{
+    0x00000001,                              /* major version                  */
+    0x00000000,                              /* minor version                  */
+    GX_PIXELMAP_ALPHA,                       /* flags                          */
+    GX_COLOR_FORMAT_32ARGB,                  /* Format                         */
+    (GX_UBYTE *) DISPLAY_1_THEME_1_PROJETIL_pixelmap_data,
+    sizeof(DISPLAY_1_THEME_1_PROJETIL_pixelmap_data),    /* the size of pixelmap_data*/
+    NULL,
+    0,                                       /* auxiliary data size            */
+    0x00,                                    /* used for transparent iamges    */
+    3,                                       /* width in pixel                 */
+    3                                        /* height in pixel                */
+};
+
 /* Pixelmap Table                                                              */
 
 
@@ -931,7 +953,8 @@ GX_CONST GX_PIXELMAP *display_1_theme_1_pixelmap_table[] =
     &DISPLAY_1_THEME_1_ASTEROIDE3_pixelmap,
     &DISPLAY_1_THEME_1_ASTEROIDE4_pixelmap,
     &DISPLAY_1_THEME_1_NAVE_pixelmap,
-    &DISPLAY_1_THEME_1_NAVE2_pixelmap
+    &DISPLAY_1_THEME_1_NAVE2_pixelmap,
+    &DISPLAY_1_THEME_1_PROJETIL_pixelmap
 };
 
 /* String values                                                               */
@@ -1003,7 +1026,7 @@ GX_THEME display_1_theme_1 =
     GX_SCROLLBAR_RELATIVE_THUMB|GX_SCROLLBAR_END_BUTTONS|GX_SCROLLBAR_HORIZONTAL,
     31,                                      /* color table size               */
     4,                                       /* font table size                */
-    11,                                      /* pixelmap table size            */
+    12,                                      /* pixelmap table size            */
     0                                        /* palette size                   */
 
 };

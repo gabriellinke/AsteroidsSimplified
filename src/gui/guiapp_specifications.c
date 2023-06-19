@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy): 18. 6.2023   Time (hh:mm): 16:08                        */
+/*  Date (dd.mm.yyyy): 19. 6.2023   Time (hh:mm): 09:10                        */
 /*******************************************************************************/
 
 
@@ -59,17 +59,6 @@ UINT gx_studio_text_button_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *co
     return status;
 }
 
-UINT gx_studio_sprite_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent)
-{
-    UINT status;
-    GX_SPRITE *sprite = (GX_SPRITE *) control_block;
-    GX_SPRITE_PROPERTIES *props = (GX_SPRITE_PROPERTIES *) info->properties;
-    status = gx_sprite_create(sprite, info->widget_name, parent,
-               props->frame_list, props->frame_count,
-               info->style, info->widget_id, &info->size);
-    return status;
-}
-
 UINT gx_studio_prompt_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent)
 {
     UINT status;
@@ -103,69 +92,12 @@ GX_WINDOW_PROPERTIES window2_properties =
 {
     0                                        /* wallpaper pixelmap id          */
 };
-GX_SPRITE_FRAME window2_asteroid_1_frame_list[1] =
-{
-    {
-        GX_PIXELMAP_ID_ASTEROIDE3,           /* pixelmap id                    */
-        0,                                   /* x offset                       */
-        0,                                   /* y offset                       */
-        0,                                   /* frame delay                    */
-        GX_SPRITE_BACKGROUND_NO_ACTION,      /* background operation           */
-        255                                  /* alpha value                    */
-    }
-};
-
-GX_SPRITE_PROPERTIES window2_asteroid_1_properties =
-{
-    window2_asteroid_1_frame_list,           /* address of frame list          */
-    1,                                       /* frame count                    */
-};
 GX_PROMPT_PROPERTIES window2_score_properties =
 {
     GX_STRING_ID_STRING_1,                   /* string id                      */
     GX_FONT_ID_PROMPT,                       /* font id                        */
     GX_COLOR_ID_WHITE,                       /* normal text color              */
     GX_COLOR_ID_WHITE                        /* selected text color            */
-};
-GX_SPRITE_FRAME window2_asteroid_2_frame_list[1] =
-{
-    {
-        GX_PIXELMAP_ID_ASTEROIDE2,           /* pixelmap id                    */
-        0,                                   /* x offset                       */
-        0,                                   /* y offset                       */
-        0,                                   /* frame delay                    */
-        GX_SPRITE_BACKGROUND_NO_ACTION,      /* background operation           */
-        255                                  /* alpha value                    */
-    }
-};
-
-GX_SPRITE_PROPERTIES window2_asteroid_2_properties =
-{
-    window2_asteroid_2_frame_list,           /* address of frame list          */
-    1,                                       /* frame count                    */
-};
-
-GX_CONST GX_STUDIO_WIDGET window2_asteroid_2_define =
-{
-    "asteroid_2",
-    GX_TYPE_SPRITE,                          /* widget type                    */
-    asteroids_2,                             /* widget id                      */
-    #if defined(GX_WIDGET_USER_DATA)
-    0,                                       /* user data                      */
-    #endif
-    GX_STYLE_BORDER_NONE|GX_STYLE_TRANSPARENT|GX_STYLE_ENABLED,   /* style flags */
-    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
-    sizeof(GX_SPRITE),                       /* control block size             */
-    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
-    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
-    gx_studio_sprite_create,                 /* create function                */
-    GX_NULL,                                 /* drawing function override      */
-    GX_NULL,                                 /* event function override        */
-    {42, 92, 57, 107},                       /* widget size                    */
-    GX_NULL,                                 /* no next widget                 */
-    GX_NULL,                                 /* no child widgets               */ 
-    offsetof(WINDOW2_CONTROL_BLOCK, window2_asteroid_2), /* control block      */
-    (void *) &window2_asteroid_2_properties  /* extended properties            */
 };
 
 GX_CONST GX_STUDIO_WIDGET window2_score_define =
@@ -184,34 +116,11 @@ GX_CONST GX_STUDIO_WIDGET window2_score_define =
     gx_studio_prompt_create,                 /* create function                */
     GX_NULL,                                 /* drawing function override      */
     GX_NULL,                                 /* event function override        */
-    {8, 0, 239, 23},                         /* widget size                    */
-    &window2_asteroid_2_define,              /* next widget definition         */
+    {9, 0, 240, 23},                         /* widget size                    */
+    GX_NULL,                                 /* no next widget                 */
     GX_NULL,                                 /* no child widgets               */ 
     offsetof(WINDOW2_CONTROL_BLOCK, window2_score), /* control block           */
     (void *) &window2_score_properties       /* extended properties            */
-};
-
-GX_CONST GX_STUDIO_WIDGET window2_asteroid_1_define =
-{
-    "asteroid_1",
-    GX_TYPE_SPRITE,                          /* widget type                    */
-    asteroids_1,                             /* widget id                      */
-    #if defined(GX_WIDGET_USER_DATA)
-    0,                                       /* user data                      */
-    #endif
-    GX_STYLE_BORDER_NONE|GX_STYLE_TRANSPARENT|GX_STYLE_ENABLED,   /* style flags */
-    GX_STATUS_ACCEPTS_FOCUS,                 /* status flags                   */
-    sizeof(GX_SPRITE),                       /* control block size             */
-    GX_COLOR_ID_WIDGET_FILL,                 /* normal color id                */
-    GX_COLOR_ID_SELECTED_FILL,               /* selected color id              */
-    gx_studio_sprite_create,                 /* create function                */
-    GX_NULL,                                 /* drawing function override      */
-    GX_NULL,                                 /* event function override        */
-    {105, 26, 136, 57},                      /* widget size                    */
-    &window2_score_define,                   /* next widget definition         */
-    GX_NULL,                                 /* no child widgets               */ 
-    offsetof(WINDOW2_CONTROL_BLOCK, window2_asteroid_1), /* control block      */
-    (void *) &window2_asteroid_1_properties  /* extended properties            */
 };
 
 GX_CONST GX_STUDIO_WIDGET window2_define =
@@ -230,9 +139,9 @@ GX_CONST GX_STUDIO_WIDGET window2_define =
     gx_studio_window_create,                 /* create function                */
     GX_NULL,                                 /* drawing function override      */
     (UINT (*)(GX_WIDGET *, GX_EVENT *)) window2_handler, /* event function override */
-    {0, 0, 239, 319},                        /* widget size                    */
+    {1, 0, 240, 319},                        /* widget size                    */
     GX_NULL,                                 /* next widget                    */
-    &window2_asteroid_1_define,              /* child widget                   */
+    &window2_score_define,                   /* child widget                   */
     0,                                       /* control block                  */
     (void *) &window2_properties             /* extended properties            */
 };

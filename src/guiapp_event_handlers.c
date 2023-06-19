@@ -21,11 +21,54 @@ void updateSpaceShip(int angle);
 void sendPressedPosition(GX_EVENT *event_ptr);
 void updateBigAsteroid(int coords);
 void updateSmallAsteroid(int coords);
+void updateBullet(int coords, GX_WINDOW *window);
 
 char buffer[12] = "0";
 
 extern GX_CANVAS display_1_canvas_control_block;
 GX_RECTANGLE dirty_area;
+
+GX_WIDGET bullet_widget;
+int bulletAlive = 0;
+
+VOID custom_widget_draw(GX_WIDGET *widget, GX_PIXELMAP *pixelmap)
+{
+    ULONG widget_style;
+    gx_widget_style_get(widget, &widget_style);
+
+    INT xpos;
+    INT ypos;
+
+    xpos = widget->gx_widget_size.gx_rectangle_right;
+    xpos -= pixelmap->gx_pixelmap_width;
+
+    ypos = widget->gx_widget_size.gx_rectangle_top;
+
+    /* draw the extra pixelmap on top of the button */
+    gx_canvas_pixelmap_draw(xpos, ypos, pixelmap);
+}
+
+VOID small_asteroid_widget_draw(GX_WIDGET *widget)
+{
+    GX_PIXELMAP *pixelmap;
+    gx_context_pixelmap_get(GX_PIXELMAP_ID_ASTEROIDE2, &pixelmap);
+    custom_widget_draw(widget, pixelmap);
+}
+
+VOID big_asteroid_widget_draw(GX_WIDGET *widget)
+{
+    GX_PIXELMAP *pixelmap;
+    gx_context_pixelmap_get(GX_PIXELMAP_ID_ASTEROIDE3, &pixelmap);
+    custom_widget_draw(widget, pixelmap);
+}
+
+
+VOID bullet_widget_draw(GX_WIDGET *widget)
+{
+    GX_PIXELMAP *pixelmap;
+    gx_context_pixelmap_get(GX_PIXELMAP_ID_PROJETIL, &pixelmap);
+    custom_widget_draw(widget, pixelmap);
+}
 
 UINT window1_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
 {
@@ -49,6 +92,7 @@ UINT window2_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
 {
     UINT result = gx_window_event_process(widget, event_ptr);
     ULONG flag;
+    GX_EVENT event;
 
     switch (event_ptr->gx_event_type){
 
@@ -61,7 +105,8 @@ UINT window2_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
             if(TX_SUCCESS != result) __BKPT(0);
             // Cada vez que o timer estourar atualiza a tela
             updateDraw(widget);
-            tx_event_flags_set(&event_flags, FLAG0, TX_OR);
+            result = tx_event_flags_set(&event_flags, FLAG0, TX_OR);
+            if(TX_SUCCESS != result) __BKPT(0);
             break;
         default:
             result = gx_window_event_process(widget, event_ptr);
@@ -121,22 +166,20 @@ void updateDraw(GX_WINDOW *widget) {
        &rect_area);
     if(GX_SUCCESS != result) __BKPT(0);
 
-
-
     ULONG message;
     UINT status;
 
-    do {
-        status = tx_queue_receive(&graphic_queue, &message, TX_NO_WAIT);
-        if(message >> 18 == 4) updateScore(message & 0x0003FFFF);
+    status = tx_queue_receive(&graphic_queue, &message, TX_NO_WAIT);
+    while(TX_SUCCESS == status) {
         if(message >> 18 == 0) updateSpaceShip(message & 0x0003FFFF);
-        if(message >> 18 == 2) updateBigAsteroid(message & 0x0003FFFF);
-        if(message >> 18 == 3) updateSmallAsteroid(message & 0x0003FFFF);
-    } while(TX_SUCCESS  == status);
+        if(message >> 18 == 1) updateBullet(message & 0x0003FFFF, widget);
+        //if(message >> 18 == 2) updateBigAsteroid(message & 0x0003FFFF);
+        //if(message >> 18 == 3) updateSmallAsteroid(message & 0x0003FFFF);
+        if(message >> 18 == 4) updateScore(message & 0x0003FFFF);
+        status = tx_queue_receive(&graphic_queue, &message, TX_NO_WAIT);
+    }
 
     if(TX_QUEUE_EMPTY != status) __BKPT(0);
-
-
 
     result = gx_canvas_drawing_complete(&display_1_canvas_control_block, GX_TRUE);
     if(GX_SUCCESS != result) __BKPT(0);
@@ -149,11 +192,11 @@ void updateSpaceShip(int angle) {
     UINT result;
     /* Get a pointer of the pixelmap resource */
     result = gx_context_pixelmap_get(GX_PIXELMAP_ID_NAVE2, &lp_pxmap);
-    if(TX_SUCCESS != result) __BKPT(0);
+    if(GX_SUCCESS != result) __BKPT(0);
 
     /* Draw the rotated pixelpmap */
     result = gx_canvas_pixelmap_rotate(108, 148, lp_pxmap, angle, -1, -1);                // only draws a rotated pixelmap, the source pixelmap is not changed;
-    if(TX_SUCCESS != result) __BKPT(0);
+    if(GX_SUCCESS != result) __BKPT(0);
 }
 
 void updateBigAsteroid(int coords) {
@@ -167,11 +210,11 @@ void updateBigAsteroid(int coords) {
     UINT result;
     /* Get a pointer of the pixelmap resource */
     result = gx_context_pixelmap_get(GX_PIXELMAP_ID_ASTEROIDE3, &lp_pxmap);
-    if(TX_SUCCESS != result) __BKPT(0);
+    if(GX_SUCCESS != result) __BKPT(0);
 
     /* Draw the rotated pixelpmap */
     result = gx_canvas_pixelmap_draw(x, y, lp_pxmap);
-    if(TX_SUCCESS != result) __BKPT(0);
+    if(GX_SUCCESS != result) __BKPT(0);
 }
 
 void updateSmallAsteroid(int coords) {
@@ -185,11 +228,11 @@ void updateSmallAsteroid(int coords) {
     UINT result;
     /* Get a pointer of the pixelmap resource */
     result = gx_context_pixelmap_get(GX_PIXELMAP_ID_ASTEROIDE2, &lp_pxmap);
-    if(TX_SUCCESS != result) __BKPT(0);
+    if(GX_SUCCESS != result) __BKPT(0);
 
     /* Draw the rotated pixelpmap */
     result = gx_canvas_pixelmap_draw(x, y, lp_pxmap);
-    if(TX_SUCCESS != result) __BKPT(0);
+    if(GX_SUCCESS != result) __BKPT(0);
 }
 
 void sendPressedPosition(GX_EVENT *event_ptr) {
@@ -200,7 +243,7 @@ void sendPressedPosition(GX_EVENT *event_ptr) {
     UINT coord  = (1 << 31) | (0 << 30) | (x << 15) | y;
 
     UINT status = tx_queue_send(&touch_queue, &coord, TX_NO_WAIT);
-    if(GX_SUCCESS != status) __BKPT(0);
+    if(TX_SUCCESS != status) __BKPT(0);
 }
 
 void updateScore(UINT score) {
@@ -219,3 +262,19 @@ void updateScore(UINT score) {
     status = gx_system_dirty_mark(widget_found);
     if(GX_SUCCESS != status) __BKPT(0);
 }
+
+void updateBullet(int coords, GX_WINDOW *window) {
+    if(!bulletAlive) {
+        GX_RECTANGLE rect_area;
+        gx_utility_rectangle_define(&rect_area, 0, 0, 32, 32);
+        UINT status = gx_widget_create((GX_WIDGET *)&bullet_widget, "bullet", window, GX_NULL, 1, &rect_area);
+        if(GX_SUCCESS != status) __BKPT(0);
+
+        gx_widget_draw_set((GX_WIDGET *)&bullet_widget, (VOID (*)(GX_WIDGET *))big_asteroid_widget_draw);
+        gx_widget_attach(window, (GX_WIDGET *)&bullet_widget);
+        bulletAlive = 1;
+    }
+
+    gx_widget_shift(&bullet_widget, 1, 1, GX_TRUE);
+}
+

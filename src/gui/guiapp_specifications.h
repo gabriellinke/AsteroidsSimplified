@@ -6,7 +6,7 @@
 /*  GUIX Studio User Guide, or visit our web site at azure.com/rtos            */
 /*                                                                             */
 /*  GUIX Studio Revision 6.2.1.2                                               */
-/*  Date (dd.mm.yyyy): 18. 6.2023   Time (hh:mm): 16:08                        */
+/*  Date (dd.mm.yyyy): 19. 6.2023   Time (hh:mm): 09:10                        */
 /*******************************************************************************/
 
 
@@ -23,14 +23,12 @@ extern   "C" {
 /* Define widget ids                                                           */
 
 #define ID_WINDOW2 1
-#define asteroids_1 2
-#define ID_SCORE 3
-#define asteroids_2 4
-#define ID_WINDOW1 5
-#define ID_BUTTON 6
-#define ID_TITLE 7
-#define ID_RECORD_SCORE_TITLE 8
-#define ID_RECORD_SCORE 9
+#define ID_SCORE 2
+#define ID_WINDOW1 3
+#define ID_BUTTON 4
+#define ID_TITLE 5
+#define ID_RECORD_SCORE_TITLE 6
+#define ID_RECORD_SCORE 7
 
 
 /* Define animation ids                                                        */
@@ -84,12 +82,6 @@ typedef struct
 
 typedef struct
 {
-    GX_SPRITE_FRAME *frame_list;
-    USHORT           frame_count;
-} GX_SPRITE_PROPERTIES;
-
-typedef struct
-{
     GX_RESOURCE_ID string_id;
     GX_RESOURCE_ID font_id;
     GX_RESOURCE_ID normal_text_color_id;
@@ -107,9 +99,7 @@ typedef struct
 typedef struct WINDOW2_CONTROL_BLOCK_STRUCT
 {
     GX_WINDOW_MEMBERS_DECLARE
-    GX_SPRITE window2_asteroid_1;
     GX_PROMPT window2_score;
-    GX_SPRITE window2_asteroid_2;
 } WINDOW2_CONTROL_BLOCK;
 
 typedef struct WINDOW1_CONTROL_BLOCK_STRUCT
@@ -218,7 +208,6 @@ typedef struct GX_STUDIO_DISPLAY_INFO_STRUCT
 /* Declare Studio-generated functions for creating top-level widgets           */
 
 UINT gx_studio_text_button_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent);
-UINT gx_studio_sprite_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent);
 UINT gx_studio_prompt_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent);
 UINT gx_studio_window_create(GX_CONST GX_STUDIO_WIDGET *info, GX_WIDGET *control_block, GX_WIDGET *parent);
 GX_WIDGET *gx_studio_widget_create(GX_BYTE *storage, GX_CONST GX_STUDIO_WIDGET *definition, GX_WIDGET *parent);
