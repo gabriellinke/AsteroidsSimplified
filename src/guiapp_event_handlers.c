@@ -15,7 +15,20 @@
 #define SMALL_ASTEROID 3
 #define SCORE 4
 #define RECORD_SCORE 5
+#define BULLET_SIZE 3
+#define BIG_ASTEROID_SIZE 32
+#define SMALL_ASTEROID_SIZE 16
 #define MAX_WIDGETS 1024
+#define MASK_ID 0xFFE00000
+#define SHIFT_ID 21
+#define MASK_TYPE 0x001C0000
+#define SHIFT_TYPE 18
+#define MASK_COORDS 0x0003FFFF
+#define SHIFT_COORDS 0
+#define MASK_COORDS_X 0x0003FE00
+#define SHIFT_COORDS_X 9
+#define MASK_COORDS_Y 0x000001FF
+#define SHIFT_COORDS_Y 0
 
 extern TX_THREAD game_engine_thread;
 extern TX_THREAD spaceship_control_thread;
@@ -34,14 +47,13 @@ VOID bullet_widget_draw(GX_WIDGET *widget);
 
 void updateScore(UINT score);
 void updateRecordScore(UINT score);
+void updateSpaceShip(int angle);
 
 void updateDraw(GX_WINDOW *widget);
-void updateSpaceShip(int angle);
-void updateBigAsteroid(int coords);
-void updateSmallAsteroid(int coords);
-void updateBullet(int coords, GX_WINDOW *window);
 
+void updateWidgets(int num_message, GX_WINDOW *window);
 void createWidget(int id, int type, GX_WINDOW *window);
+void drawWidget(int position, int message);
 
 typedef struct {
     int id;
@@ -50,11 +62,9 @@ typedef struct {
 
 int num_widgets = 0;
 MyWidget widgetArray[MAX_WIDGETS];
-GX_WIDGET tempWidget;
+int widgetsToUpdate[MAX_WIDGETS];
 
 char buffer[12] = "0";
-
-int count = 0;
 
 VOID custom_widget_draw(GX_WIDGET *widget, GX_PIXELMAP *pixelmap)
 {
@@ -207,16 +217,21 @@ void updateDraw(GX_WINDOW *widget) {
     ULONG message;
     UINT status;
 
+    int i=0;
+
     status = tx_queue_receive(&graphic_queue, &message, TX_NO_WAIT);
     while(TX_SUCCESS == status) {
-        if(message >> 18 == SPACESHIP) updateSpaceShip(message & 0x0003FFFF);
-        if(message >> 18 == BULLET) updateBullet(message & 0x0003FFFF, widget);
-        //if(message >> 18 == BIG_ASTEROID) updateBigAsteroid(message & 0x0003FFFF);
-        //if(message >> 18 == SMALL_ASTEROID) updateSmallAsteroid(message & 0x0003FFFF);
-        if(message >> 18 == SCORE) updateScore(message & 0x0003FFFF);
-        if(message >> 18 == RECORD_SCORE) updateRecordScore(message & 0x0003FFFF);
+        if((message & MASK_TYPE) >> SHIFT_TYPE == SPACESHIP) updateSpaceShip(message & 0x0003FFFF);
+        if((message & MASK_TYPE) >> SHIFT_TYPE == SCORE) updateScore(message & 0x0003FFFF);
+        if((message & MASK_TYPE) >> SHIFT_TYPE == RECORD_SCORE) updateRecordScore(message & 0x0003FFFF);
+        if(((message & MASK_TYPE) >> SHIFT_TYPE == BULLET) || ((message & MASK_TYPE) >> SHIFT_TYPE == BIG_ASTEROID) || ((message & MASK_TYPE) >> SHIFT_TYPE == SMALL_ASTEROID)) {
+            widgetsToUpdate[i] = message;
+            i++;
+        }
         status = tx_queue_receive(&graphic_queue, &message, TX_NO_WAIT);
     }
+
+    updateWidgets(i, widget);
 
     if(TX_QUEUE_EMPTY != status) __BKPT(0);
 
@@ -238,40 +253,90 @@ void updateSpaceShip(int angle) {
     if(GX_SUCCESS != result) __BKPT(0);
 }
 
-void updateBigAsteroid(int coords) {
-    int COORD_Y_MASK = 0x1FF;
-    int COORD_X_MASK = 0x1FF00;
-    int x = (coords & COORD_X_MASK) >> 9;
-    int y = (coords & COORD_Y_MASK);
 
+void updateWidgets(int num_messages, GX_WINDOW *window) {
+    if(!num_messages) {
+        for(int i=0; i < MAX_WIDGETS; i++) {
+            // Remove todos os widgets da window
+            if(widgetArray[i].id != 0) {
+                gx_widget_detach(&widgetArray[i].widget);
+                gx_widget_delete(&widgetArray[i].widget);
+            }
+            widgetArray[i].id = 0;
+            widgetsToUpdate[i] = 0;
+        }
+        return;
+    }
 
-    GX_PIXELMAP * lp_pxmap;
-    UINT result;
-    /* Get a pointer of the pixelmap resource */
-    result = gx_context_pixelmap_get(GX_PIXELMAP_ID_ASTEROIDE3, &lp_pxmap);
-    if(GX_SUCCESS != result) __BKPT(0);
+    int i, j;
+    for(i=0; i < num_messages; i++) {
+        int message = widgetsToUpdate[i];
+        int id = (message & MASK_ID) >> SHIFT_ID;
+        int type = (message & MASK_TYPE) >> SHIFT_TYPE;
+        int widgetExists = 0;
 
-    /* Draw the rotated pixelpmap */
-    result = gx_canvas_pixelmap_draw(x, y, lp_pxmap);
-    if(GX_SUCCESS != result) __BKPT(0);
+        for(j=0; j<MAX_WIDGETS; j++) if(widgetArray[j].id == id) widgetExists = 1;
+
+        // ID não está no array -> cria widget e adiciona no array
+        // No fim todos os IDS do widgetsToUpdate estarão no array
+        if(!widgetExists) {
+            createWidget(id, type, window);
+        }
+    }
+
+    // Compara os IDS dos 2 vetores. Se no array tem IDs sobrando, remove widget da window, exclui o widget e tira do array
+    for(j=0; j<MAX_WIDGETS; j++) {
+        if(widgetArray[j].id != 0) {
+            int isInUpdateArray = 0;
+            for(i=0; i < num_messages; i++) {
+                int message = widgetsToUpdate[i];
+                int id = (message & MASK_ID) >> SHIFT_ID;
+                if(widgetArray[j].id == id) isInUpdateArray = 1;
+            }
+            if(!isInUpdateArray) {
+                gx_widget_detach(&widgetArray[j].widget);
+                gx_widget_delete(&widgetArray[j].widget);
+                widgetArray[j].id = 0;
+            }
+        }
+    }
+
+    // Desenha todos os widgets que estiverem no array
+    for(i=0; i < num_messages; i++) {
+        int message = widgetsToUpdate[i];
+        int id = (message & MASK_ID) >> SHIFT_ID;
+
+        for(j=0; j<MAX_WIDGETS; j++)
+            if(widgetArray[j].id == id)
+                drawWidget(j, message);
+    }
+
+    // Limpa widgetsToUpdate
+    for(i=0; i < MAX_WIDGETS; i++) {
+        widgetsToUpdate[i] = 0;
+    }
 }
 
-void updateSmallAsteroid(int coords) {
-    int COORD_Y_MASK = 0x1FF;
-    int COORD_X_MASK = 0x1FF00;
-    int x = (coords & COORD_X_MASK) >> 9;
-    int y = (coords & COORD_Y_MASK);
 
+void drawWidget(int position, int message) {
+    int type = (message & MASK_TYPE) >> SHIFT_TYPE;
+    int x = (message & MASK_COORDS_X) >> SHIFT_COORDS_X;
+    int y = (message & MASK_COORDS_Y) >> SHIFT_COORDS_Y;
 
-    GX_PIXELMAP * lp_pxmap;
-    UINT result;
-    /* Get a pointer of the pixelmap resource */
-    result = gx_context_pixelmap_get(GX_PIXELMAP_ID_ASTEROIDE2, &lp_pxmap);
-    if(GX_SUCCESS != result) __BKPT(0);
+    int size = 0;
+    if(type == BULLET) size = BULLET_SIZE;
+    else if(type == BIG_ASTEROID) size = BIG_ASTEROID_SIZE;
+    else size = SMALL_ASTEROID_SIZE;
 
-    /* Draw the rotated pixelpmap */
-    result = gx_canvas_pixelmap_draw(x, y, lp_pxmap);
-    if(GX_SUCCESS != result) __BKPT(0);
+    GX_RECTANGLE client;
+    gx_widget_client_get(&widgetArray[position].widget, 0, &client);
+    GX_VALUE xpos = client.gx_rectangle_left + size/2;
+    GX_VALUE ypos = client.gx_rectangle_top + size/2;
+
+    GX_VALUE dx = x - xpos;
+    GX_VALUE dy = y - ypos;
+    UINT status = gx_widget_shift(&widgetArray[position].widget, dx, dy, GX_TRUE);
+    if(GX_SUCCESS != status) __BKPT(0);
 }
 
 void sendPressedPosition(GX_EVENT *event_ptr) {
@@ -319,20 +384,6 @@ void updateRecordScore(UINT score) {
     if(GX_SUCCESS != status) __BKPT(0);
 }
 
-void updateBullet(int coords, GX_WINDOW *window) {
-    if(!count) {
-        int type = rand()%3+1;
-        createWidget(num_widgets+1, type, window);
-        count = 40;
-    }
-
-    for(int i = 0; i < MAX_WIDGETS; i++) {
-        if(widgetArray[i].id)
-            gx_widget_shift(&widgetArray[i].widget, 1, 1, GX_TRUE);
-    }
-    count--;
-}
-
 void createWidget(int id, int type, GX_WINDOW *window) {
     GX_RECTANGLE rect_area;
     UINT status;
@@ -340,35 +391,35 @@ void createWidget(int id, int type, GX_WINDOW *window) {
     int random_number = rand()%2+1;
     switch(type) {
         case 1:
-            gx_utility_rectangle_define(&rect_area, 0, 0, 3, 3);
-            status = gx_widget_create((GX_WIDGET *)&widgetArray[num_widgets].widget, "bullet", window, GX_NULL, id, &rect_area);
+            gx_utility_rectangle_define(&rect_area, 0, 0, BULLET_SIZE, BULLET_SIZE);
+            status = gx_widget_create((GX_WIDGET *)&widgetArray[num_widgets % MAX_WIDGETS].widget, "bullet", window, GX_NULL, id, &rect_area);
             if(GX_SUCCESS != status) __BKPT(0);
-            gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets].widget, (VOID (*)(GX_WIDGET *))bullet_widget_draw);
-            gx_widget_attach(window, (GX_WIDGET *)&widgetArray[num_widgets].widget);
+            gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets % MAX_WIDGETS].widget, (VOID (*)(GX_WIDGET *))bullet_widget_draw);
+            gx_widget_attach(window, (GX_WIDGET *)&widgetArray[num_widgets % MAX_WIDGETS].widget);
             break;
         case 2:
-            gx_utility_rectangle_define(&rect_area, 0, 0, 32, 32);
-            status = gx_widget_create((GX_WIDGET *)&widgetArray[num_widgets].widget, "big asteroid", window, GX_NULL, id, &rect_area);
+            gx_utility_rectangle_define(&rect_area, 0, 0, BIG_ASTEROID_SIZE, BIG_ASTEROID_SIZE);
+            status = gx_widget_create((GX_WIDGET *)&widgetArray[num_widgets % MAX_WIDGETS].widget, "big asteroid", window, GX_NULL, id, &rect_area);
             if(GX_SUCCESS != status) __BKPT(0);
             if(random_number == 1)
-                gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets].widget, (VOID (*)(GX_WIDGET *))big_asteroid1_widget_draw);
+                gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets % MAX_WIDGETS].widget, (VOID (*)(GX_WIDGET *))big_asteroid1_widget_draw);
             else
-                gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets].widget, (VOID (*)(GX_WIDGET *))big_asteroid2_widget_draw);
-            gx_widget_attach(window, (GX_WIDGET *)&widgetArray[num_widgets].widget);
+                gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets % MAX_WIDGETS].widget, (VOID (*)(GX_WIDGET *))big_asteroid2_widget_draw);
+            gx_widget_attach(window, (GX_WIDGET *)&widgetArray[num_widgets % MAX_WIDGETS].widget);
             break;
         case 3:
-            gx_utility_rectangle_define(&rect_area, 0, 0, 16, 16);
-            status = gx_widget_create((GX_WIDGET *)&widgetArray[num_widgets].widget, "small asteroid", window, GX_NULL, id, &rect_area);
+            gx_utility_rectangle_define(&rect_area, 0, 0, SMALL_ASTEROID_SIZE, BIG_ASTEROID_SIZE);
+            status = gx_widget_create((GX_WIDGET *)&widgetArray[num_widgets % MAX_WIDGETS].widget, "small asteroid", window, GX_NULL, id, &rect_area);
             if(GX_SUCCESS != status) __BKPT(0);
             if(random_number == 1)
-                gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets].widget, (VOID (*)(GX_WIDGET *))small_asteroid1_widget_draw);
+                gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets % MAX_WIDGETS].widget, (VOID (*)(GX_WIDGET *))small_asteroid1_widget_draw);
             else
-                gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets].widget, (VOID (*)(GX_WIDGET *))small_asteroid2_widget_draw);
-            gx_widget_attach(window, (GX_WIDGET *)&widgetArray[num_widgets].widget);
+                gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets % MAX_WIDGETS].widget, (VOID (*)(GX_WIDGET *))small_asteroid2_widget_draw);
+            gx_widget_attach(window, (GX_WIDGET *)&widgetArray[num_widgets % MAX_WIDGETS].widget);
             break;
         default:
             break;
     }
-    widgetArray[num_widgets].id = id;
+    widgetArray[num_widgets % MAX_WIDGETS].id = id;
     num_widgets++;
 }

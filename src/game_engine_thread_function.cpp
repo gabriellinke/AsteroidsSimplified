@@ -16,9 +16,9 @@
 
 ULONG points = 0;
 INT angle = 0;
-INT x1 = 20, x2 = 200, y1 = 20, y2 = 280;
+INT x1 = 20, x2 = 200, y1 = 20, y2 = 280, x3 = 0, y3 = 0;
 
-INT x3, y3, dx, dy, bullet = 0;
+int counter = 1000;
 
 extern "C" void game_engine_thread_function(void);
 
@@ -29,7 +29,6 @@ void updateScoreGraphics();
 void updateSpaceshipGraphics();
 void updateAsteroidsGraphics();
 void calculateSpaceshipAimAngle(UINT coord);
-void shotBullet();
 
 void game_engine_thread_function(void)
 {
@@ -99,10 +98,8 @@ void getInputs() {
         if(message >> 30 == 0x0) {
             points += 10;
             updateScoreGraphics();
-            shotBullet();
         } else {
             calculateSpaceshipAimAngle(message);
-            updateSpaceshipGraphics();
         }
         status = tx_queue_receive(&control_queue, &message, TX_NO_WAIT);
     }
@@ -113,30 +110,40 @@ void getInputs() {
 void updateGame() {
     x1+=1;
     y1+=1;
-    x2-=1;
-    y2-=1;
-
-    if(bullet) {
-        x3 += dx;
-        y3 += dy;
-    }
+    x2-=2;
+    y2-=2;
+    x3-=3;
+    y3-=3;
+    counter--;
 
     ULONG message, status;
-    ULONG test = 2 << 18 | x1 << 9 | y1;
-    status = tx_queue_send(&graphic_queue, &test, TX_NO_WAIT);
-    if(TX_SUCCESS != status) __BKPT(0);
-    test = 3 << 18 | x2 << 9 | y2;
-    status = tx_queue_send(&graphic_queue, &test, TX_NO_WAIT);
-    if(TX_SUCCESS != status) __BKPT(0);
-    test = 1 << 18 | x3 << 9 | y3;
-    status = tx_queue_send(&graphic_queue, &test, TX_NO_WAIT);
-    if(TX_SUCCESS != status) __BKPT(0);
-}
+    if(counter > 600) {
+        message = 1 << 21 | 2 << 18 | x1 << 9 | y1;
+        status = tx_queue_send(&graphic_queue, &message, TX_NO_WAIT);
+        if(TX_SUCCESS != status) __BKPT(0);
+    }
+    if(counter > 300) {
+        message = 2 << 21 | 3 << 18 | x2 << 9 | y2;
+        status = tx_queue_send(&graphic_queue, &message, TX_NO_WAIT);
+        if(TX_SUCCESS != status) __BKPT(0);
+    }
+    if(counter > 0) {
+        message = 3 << 21 | 1 << 18 | x3 << 9 | y3;
+        status = tx_queue_send(&graphic_queue, &message, TX_NO_WAIT);
+        if(TX_SUCCESS != status) __BKPT(0);
+    }
+    updateSpaceshipGraphics();
 
-void shotBullet() {
-    bullet = 1;
-    x3 = x_0 +12;
-    y3 = y_0 - 12;
-    dx = 0;
-    dy = -4;
+    if(x1 > 240) x1 = 0;
+    if(x2 > 240) x2 = 0;
+    if(x3 > 240) x3 = 0;
+    if(y1 > 320) y1 = 0;
+    if(y2 > 320) y2 = 0;
+    if(y3 > 320) y3 = 0;
+    if(x1 < 0) x1 = 240;
+    if(x2 < 0) x2 = 240;
+    if(x3 < 0) x3 = 240;
+    if(y1 < 0) y1 = 320;
+    if(y2 < 0) y2 = 320;
+    if(y3 < 0) y3 = 320;
 }
