@@ -110,10 +110,6 @@ void getInputs() {
     if(TX_QUEUE_EMPTY != status) __BKPT(0);
 }
 
-void createGame() {
-
-}
-
 void updateGame() {
     x1+=1;
     y1+=1;

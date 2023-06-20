@@ -1,35 +1,60 @@
 #include "gui/guiapp_resources.h"
 #include "gui/guiapp_specifications.h"
-#include <string.h>
-#include <stdio.h>
-
 #include "main_thread.h"
 #include "spaceship_control_thread.h"
 #include "game_engine_thread.h"
+#include <string.h>
+#include <stdio.h>
+#include <time.h>
 
 #define FLAG0 (1 << 0)
 #define FLAG1 (1 << 1)
+#define SPACESHIP 0
+#define BULLET 1
+#define BIG_ASTEROID 2
+#define SMALL_ASTEROID 3
+#define SCORE 4
+#define RECORD_SCORE 5
+#define MAX_WIDGETS 1024
 
 extern TX_THREAD game_engine_thread;
 extern TX_THREAD spaceship_control_thread;
+extern GX_CANVAS display_1_canvas_control_block;
 extern GX_WINDOW_ROOT * p_window_root;
 
+void sendPressedPosition(GX_EVENT *event_ptr);
+
 static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old);
+VOID custom_widget_draw(GX_WIDGET *widget, GX_PIXELMAP *pixelmap);
+VOID big_asteroid1_widget_draw(GX_WIDGET *widget);
+VOID big_asteroid2_widget_draw(GX_WIDGET *widget);
+VOID small_asteroid1_widget_draw(GX_WIDGET *widget);
+VOID small_asteroid2_widget_draw(GX_WIDGET *widget);
+VOID bullet_widget_draw(GX_WIDGET *widget);
+
 void updateScore(UINT score);
+void updateRecordScore(UINT score);
+
 void updateDraw(GX_WINDOW *widget);
 void updateSpaceShip(int angle);
-void sendPressedPosition(GX_EVENT *event_ptr);
 void updateBigAsteroid(int coords);
 void updateSmallAsteroid(int coords);
 void updateBullet(int coords, GX_WINDOW *window);
 
+void createWidget(int id, int type, GX_WINDOW *window);
+
+typedef struct {
+    int id;
+    GX_WIDGET widget;
+} MyWidget;
+
+int num_widgets = 0;
+MyWidget widgetArray[MAX_WIDGETS];
+GX_WIDGET tempWidget;
+
 char buffer[12] = "0";
 
-extern GX_CANVAS display_1_canvas_control_block;
-GX_RECTANGLE dirty_area;
-
-GX_WIDGET bullet_widget;
-int bulletAlive = 0;
+int count = 0;
 
 VOID custom_widget_draw(GX_WIDGET *widget, GX_PIXELMAP *pixelmap)
 {
@@ -48,20 +73,33 @@ VOID custom_widget_draw(GX_WIDGET *widget, GX_PIXELMAP *pixelmap)
     gx_canvas_pixelmap_draw(xpos, ypos, pixelmap);
 }
 
-VOID small_asteroid_widget_draw(GX_WIDGET *widget)
+VOID small_asteroid1_widget_draw(GX_WIDGET *widget)
 {
     GX_PIXELMAP *pixelmap;
     gx_context_pixelmap_get(GX_PIXELMAP_ID_ASTEROIDE2, &pixelmap);
     custom_widget_draw(widget, pixelmap);
 }
 
-VOID big_asteroid_widget_draw(GX_WIDGET *widget)
+VOID small_asteroid2_widget_draw(GX_WIDGET *widget)
+{
+    GX_PIXELMAP *pixelmap;
+    gx_context_pixelmap_get(GX_PIXELMAP_ID_ASTEROIDE4, &pixelmap);
+    custom_widget_draw(widget, pixelmap);
+}
+
+VOID big_asteroid1_widget_draw(GX_WIDGET *widget)
+{
+    GX_PIXELMAP *pixelmap;
+    gx_context_pixelmap_get(GX_PIXELMAP_ID_ASTEROIDE1, &pixelmap);
+    custom_widget_draw(widget, pixelmap);
+}
+
+VOID big_asteroid2_widget_draw(GX_WIDGET *widget)
 {
     GX_PIXELMAP *pixelmap;
     gx_context_pixelmap_get(GX_PIXELMAP_ID_ASTEROIDE3, &pixelmap);
     custom_widget_draw(widget, pixelmap);
 }
-
 
 VOID bullet_widget_draw(GX_WIDGET *widget)
 {
@@ -171,11 +209,12 @@ void updateDraw(GX_WINDOW *widget) {
 
     status = tx_queue_receive(&graphic_queue, &message, TX_NO_WAIT);
     while(TX_SUCCESS == status) {
-        if(message >> 18 == 0) updateSpaceShip(message & 0x0003FFFF);
-        if(message >> 18 == 1) updateBullet(message & 0x0003FFFF, widget);
-        //if(message >> 18 == 2) updateBigAsteroid(message & 0x0003FFFF);
-        //if(message >> 18 == 3) updateSmallAsteroid(message & 0x0003FFFF);
-        if(message >> 18 == 4) updateScore(message & 0x0003FFFF);
+        if(message >> 18 == SPACESHIP) updateSpaceShip(message & 0x0003FFFF);
+        if(message >> 18 == BULLET) updateBullet(message & 0x0003FFFF, widget);
+        //if(message >> 18 == BIG_ASTEROID) updateBigAsteroid(message & 0x0003FFFF);
+        //if(message >> 18 == SMALL_ASTEROID) updateSmallAsteroid(message & 0x0003FFFF);
+        if(message >> 18 == SCORE) updateScore(message & 0x0003FFFF);
+        if(message >> 18 == RECORD_SCORE) updateRecordScore(message & 0x0003FFFF);
         status = tx_queue_receive(&graphic_queue, &message, TX_NO_WAIT);
     }
 
@@ -263,18 +302,73 @@ void updateScore(UINT score) {
     if(GX_SUCCESS != status) __BKPT(0);
 }
 
-void updateBullet(int coords, GX_WINDOW *window) {
-    if(!bulletAlive) {
-        GX_RECTANGLE rect_area;
-        gx_utility_rectangle_define(&rect_area, 0, 0, 32, 32);
-        UINT status = gx_widget_create((GX_WIDGET *)&bullet_widget, "bullet", window, GX_NULL, 1, &rect_area);
-        if(GX_SUCCESS != status) __BKPT(0);
+void updateRecordScore(UINT score) {
+    GX_WIDGET *widget_found;
 
-        gx_widget_draw_set((GX_WIDGET *)&bullet_widget, (VOID (*)(GX_WIDGET *))big_asteroid_widget_draw);
-        gx_widget_attach(window, (GX_WIDGET *)&bullet_widget);
-        bulletAlive = 1;
-    }
+    snprintf(buffer, sizeof(buffer), "%d", score);
+    GX_STRING new_string;
+    new_string.gx_string_ptr = buffer;
+    new_string.gx_string_length = strlen(new_string.gx_string_ptr);
 
-    gx_widget_shift(&bullet_widget, 1, 1, GX_TRUE);
+    // Update score
+    UINT status = gx_system_widget_find(ID_RECORD_SCORE, GX_SEARCH_DEPTH_INFINITE, &widget_found);
+    if(GX_SUCCESS != status) __BKPT(0);
+    status = gx_prompt_text_set_ext((GX_PROMPT *)widget_found, &new_string);
+    if(GX_SUCCESS != status) __BKPT(0);
+    status = gx_system_dirty_mark(widget_found);
+    if(GX_SUCCESS != status) __BKPT(0);
 }
 
+void updateBullet(int coords, GX_WINDOW *window) {
+    if(!count) {
+        int type = rand()%3+1;
+        createWidget(num_widgets+1, type, window);
+        count = 40;
+    }
+
+    for(int i = 0; i < MAX_WIDGETS; i++) {
+        if(widgetArray[i].id)
+            gx_widget_shift(&widgetArray[i].widget, 1, 1, GX_TRUE);
+    }
+    count--;
+}
+
+void createWidget(int id, int type, GX_WINDOW *window) {
+    GX_RECTANGLE rect_area;
+    UINT status;
+    srand(time(NULL));
+    int random_number = rand()%2+1;
+    switch(type) {
+        case 1:
+            gx_utility_rectangle_define(&rect_area, 0, 0, 3, 3);
+            status = gx_widget_create((GX_WIDGET *)&widgetArray[num_widgets].widget, "bullet", window, GX_NULL, id, &rect_area);
+            if(GX_SUCCESS != status) __BKPT(0);
+            gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets].widget, (VOID (*)(GX_WIDGET *))bullet_widget_draw);
+            gx_widget_attach(window, (GX_WIDGET *)&widgetArray[num_widgets].widget);
+            break;
+        case 2:
+            gx_utility_rectangle_define(&rect_area, 0, 0, 32, 32);
+            status = gx_widget_create((GX_WIDGET *)&widgetArray[num_widgets].widget, "big asteroid", window, GX_NULL, id, &rect_area);
+            if(GX_SUCCESS != status) __BKPT(0);
+            if(random_number == 1)
+                gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets].widget, (VOID (*)(GX_WIDGET *))big_asteroid1_widget_draw);
+            else
+                gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets].widget, (VOID (*)(GX_WIDGET *))big_asteroid2_widget_draw);
+            gx_widget_attach(window, (GX_WIDGET *)&widgetArray[num_widgets].widget);
+            break;
+        case 3:
+            gx_utility_rectangle_define(&rect_area, 0, 0, 16, 16);
+            status = gx_widget_create((GX_WIDGET *)&widgetArray[num_widgets].widget, "small asteroid", window, GX_NULL, id, &rect_area);
+            if(GX_SUCCESS != status) __BKPT(0);
+            if(random_number == 1)
+                gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets].widget, (VOID (*)(GX_WIDGET *))small_asteroid1_widget_draw);
+            else
+                gx_widget_draw_set((GX_WIDGET *)&widgetArray[num_widgets].widget, (VOID (*)(GX_WIDGET *))small_asteroid2_widget_draw);
+            gx_widget_attach(window, (GX_WIDGET *)&widgetArray[num_widgets].widget);
+            break;
+        default:
+            break;
+    }
+    widgetArray[num_widgets].id = id;
+    num_widgets++;
+}

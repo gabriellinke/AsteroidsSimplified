@@ -1388,6 +1388,24 @@
 <enabled>TRUE</enabled>
 <compress>FALSE</compress>
 </resource>
+<resource>
+<name>Add New String</name>
+<pathinfo>
+<pathtype>project_relative</pathtype>
+</pathinfo>
+<is_default>FALSE</is_default>
+<enabled>TRUE</enabled>
+<compress>FALSE</compress>
+</resource>
+<resource>
+<name>Add New String</name>
+<pathinfo>
+<pathtype>project_relative</pathtype>
+</pathinfo>
+<is_default>FALSE</is_default>
+<enabled>TRUE</enabled>
+<compress>FALSE</compress>
+</resource>
 </resource>
 <vscroll_appearance>
 <scroll_width>20</scroll_width>
@@ -1604,7 +1622,7 @@
 <id_name>ID_RECORD_SCORE</id_name>
 <template>FALSE</template>
 <visible_at_startup>FALSE</visible_at_startup>
-<string_id>RECORD_SCORE</string_id>
+<string_id>STRING_1</string_id>
 <font_id>PROMPT</font_id>
 <normal_text_color>WHITE</normal_text_color>
 <selected_text_color>WHITE</selected_text_color>
