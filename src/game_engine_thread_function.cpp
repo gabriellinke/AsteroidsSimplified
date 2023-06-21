@@ -1,38 +1,34 @@
 #include "game_engine_thread.h"
+#include "constants.h"
+
 #include <stdio.h>
 #include <math.h>
-
 #include "MyClass.h"
 #include <vector>
 
-#define x_0 120
-#define y_0 160
-#define y_max 320
-#define x_max 240
-#define PI 3.14159
 
-#define FLAG0 (1 << 0)
-#define FLAG1 (1 << 1)
-
+/* Variáveis para testes */
 ULONG points = 0;
 INT angle = 0;
 INT x1 = 20, x2 = 200, y1 = 20, y2 = 280, x3 = 0, y3 = 0;
 
 int counter = 1000;
 
-extern "C" void game_engine_thread_function(void);
-
-void getInputs();
-void updateGame();
-
 void updateScoreGraphics();
 void updateSpaceshipGraphics();
 void updateAsteroidsGraphics();
+
+/*=====================================================================================*/
+
+extern "C" void game_engine_thread_function(void);
+
 void calculateSpaceshipAimAngle(UINT coord);
+void getInputs();
+void updateGame();
 
 void game_engine_thread_function(void)
 {
-    ULONG message, status, flag;
+    ULONG status, flag;
     updateScoreGraphics();
     updateSpaceshipGraphics();
     updateAsteroidsGraphics();
@@ -53,13 +49,13 @@ void game_engine_thread_function(void)
 
 
 void updateScoreGraphics() {
-    ULONG update_score_message = 4 << 18 | points;
+    ULONG update_score_message = SCORE << SHIFT_TYPE | points;
     ULONG status = tx_queue_send(&graphic_queue, &update_score_message, TX_NO_WAIT);
     if(TX_SUCCESS != status) __BKPT(0);
 }
 
 void updateSpaceshipGraphics() {
-    ULONG update_spaceship_message = 0 << 18 | angle;
+    ULONG update_spaceship_message = SPACESHIP << SHIFT_TYPE | angle;
     ULONG status = tx_queue_send(&graphic_queue, &update_spaceship_message, TX_NO_WAIT);
     if(TX_SUCCESS != status) __BKPT(0);
 }
@@ -82,21 +78,23 @@ void updateAsteroidsGraphics() {
 
 void calculateSpaceshipAimAngle(UINT coord) {
     // Extract the values from the bits
-    int x = (coord >> 15) & 0x7FFF;
-    int y = y_max - (coord & 0x7FFF);
-    int diff_x = x-x_0;
-    int diff_y = y-y_0;
+    int x = ((coord & MASK_COORDS_X) >> SHIFT_COORDS_X);
+    int y = Y_MAX - ((coord & MASK_COORDS_Y) >> SHIFT_COORDS_Y); // Invert Y axis to calculate angle properly
+    int diff_x = x-X_MAX/2;
+    int diff_y = y-Y_MAX/2;
     double angle_rad = atan2(diff_y, diff_x);
     double angle_deg = angle_rad * 180.0 / PI;
     angle = (360 + 90-(INT)(angle_deg))%360;
 }
 
+// TODO: Atirar ao recer mensagem de shot
 void getInputs() {
     ULONG message, status;
     status = tx_queue_receive(&control_queue, &message, TX_NO_WAIT);
     while(TX_SUCCESS == status) {
-        if(message >> 30 == 0x0) {
+        if(message >> SHIFT_INPUT == SHOT_MESSAGE) {
             points += 10;
+            // TODO: Adicionar tiro e remover a parte do score
             updateScoreGraphics();
         } else {
             calculateSpaceshipAimAngle(message);
@@ -118,32 +116,32 @@ void updateGame() {
 
     ULONG message, status;
     if(counter > 600) {
-        message = 1 << 21 | 2 << 18 | x1 << 9 | y1;
+        message = 1 << SHIFT_ID | BIG_ASTEROID << SHIFT_TYPE | x1 << SHIFT_COORDS_X | y1 << SHIFT_COORDS_Y;
         status = tx_queue_send(&graphic_queue, &message, TX_NO_WAIT);
         if(TX_SUCCESS != status) __BKPT(0);
     }
     if(counter > 300) {
-        message = 2 << 21 | 3 << 18 | x2 << 9 | y2;
+        message = 2 << SHIFT_ID | SMALL_ASTEROID << SHIFT_TYPE | x2 << SHIFT_COORDS_X | y2 << SHIFT_COORDS_Y;
         status = tx_queue_send(&graphic_queue, &message, TX_NO_WAIT);
         if(TX_SUCCESS != status) __BKPT(0);
     }
     if(counter > 0) {
-        message = 3 << 21 | 1 << 18 | x3 << 9 | y3;
+        message = 3 << SHIFT_ID | BULLET << SHIFT_TYPE | x3 << SHIFT_COORDS_X | y3 << SHIFT_COORDS_Y;
         status = tx_queue_send(&graphic_queue, &message, TX_NO_WAIT);
         if(TX_SUCCESS != status) __BKPT(0);
     }
     updateSpaceshipGraphics();
 
-    if(x1 > 240) x1 = 0;
-    if(x2 > 240) x2 = 0;
-    if(x3 > 240) x3 = 0;
-    if(y1 > 320) y1 = 0;
-    if(y2 > 320) y2 = 0;
-    if(y3 > 320) y3 = 0;
-    if(x1 < 0) x1 = 240;
-    if(x2 < 0) x2 = 240;
-    if(x3 < 0) x3 = 240;
-    if(y1 < 0) y1 = 320;
-    if(y2 < 0) y2 = 320;
-    if(y3 < 0) y3 = 320;
+    if(x1 > X_MAX) x1 = 0;
+    if(x2 > X_MAX) x2 = 0;
+    if(x3 > X_MAX) x3 = 0;
+    if(y1 > Y_MAX) y1 = 0;
+    if(y2 > Y_MAX) y2 = 0;
+    if(y3 > Y_MAX) y3 = 0;
+    if(x1 < 0) x1 = X_MAX;
+    if(x2 < 0) x2 = X_MAX;
+    if(x3 < 0) x3 = X_MAX;
+    if(y1 < 0) y1 = Y_MAX;
+    if(y2 < 0) y2 = Y_MAX;
+    if(y3 < 0) y3 = Y_MAX;
 }

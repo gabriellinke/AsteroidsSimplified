@@ -1,0 +1,28 @@
+#define FLAG0 (1 << 0)
+#define FLAG1 (1 << 1)
+#define SHOT_MESSAGE 0x0
+#define TOUCH_MESSAGE 0x2
+#define SPACESHIP 0
+#define BULLET 1
+#define BIG_ASTEROID 2
+#define SMALL_ASTEROID 3
+#define SCORE 4
+#define RECORD_SCORE 5
+#define BULLET_SIZE 3
+#define BIG_ASTEROID_SIZE 32
+#define SMALL_ASTEROID_SIZE 16
+#define MAX_WIDGETS 1024
+#define MASK_ID 0xFFE00000
+#define SHIFT_ID 21
+#define MASK_TYPE 0x001C0000
+#define SHIFT_TYPE 18
+#define MASK_COORDS 0x0003FFFF
+#define SHIFT_COORDS 0
+#define MASK_COORDS_X 0x0003FE00
+#define SHIFT_COORDS_X 9
+#define MASK_COORDS_Y 0x000001FF
+#define SHIFT_COORDS_Y 0
+#define SHIFT_INPUT 30
+#define Y_MAX 320
+#define X_MAX 240
+#define PI 3.14159

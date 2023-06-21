@@ -1,10 +1,8 @@
 #include "hal_data.h"
-#include <stdio.h>
-#include <math.h>
+#include "constants.h"
 #include "spaceship_control_thread.h"
 #include "game_engine_thread.h"
-
-extern void initialise_monitor_handles(void);
+#include <math.h>
 
 void button_timer_callback();
 ULONG TIMER_TICKS = ceil(100/6); // 1 second / 6
@@ -14,13 +12,11 @@ int button_timer_expired = 1;
 /* Spaceship Control Thread entry function */
 void spaceship_control_thread_entry(void)
 {
-    UINT status_button, status_touch, button_message, touch_message;
-
-    initialise_monitor_handles(); //Used for printf outputs
+    UINT status_button, status_touch, timer_status, button_message, touch_message;
     /* Initialize button interruption */
     button_interrupt.p_api->open(button_interrupt.p_ctrl,button_interrupt.p_cfg); // Open instance and initialize.
 
-    UINT timer_status = tx_timer_create(&button_timer, "Button Timer", button_timer_callback, TX_NULL, TIMER_TICKS, 0, TX_NO_ACTIVATE);
+    timer_status = tx_timer_create(&button_timer, "Button Timer", button_timer_callback, TX_NULL, TIMER_TICKS, 0, TX_NO_ACTIVATE);
     if(GX_SUCCESS != timer_status) __BKPT(0);
 
     while (1)
@@ -46,7 +42,7 @@ void spaceship_control_thread_entry(void)
 }
 
 void button_callback(external_irq_callback_args_t *p_args) {
-    ULONG parameter_message = 1;
+    ULONG parameter_message = SHOT_MESSAGE;
     UINT status = tx_queue_send(&button_queue, &parameter_message, TX_NO_WAIT);
     if(GX_SUCCESS != status) __BKPT(0);
 }
