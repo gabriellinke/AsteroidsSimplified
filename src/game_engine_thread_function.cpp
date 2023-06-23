@@ -3,7 +3,8 @@
 
 #include <stdio.h>
 #include <math.h>
-#include "MyClass.h"
+#include "game_logic/MyClass.h"
+#include "game_logic/Space.h"
 #include <vector>
 
 
@@ -29,6 +30,9 @@ void updateGame();
 void game_engine_thread_function(void)
 {
     ULONG status, flag;
+    Space space;
+    std::vector<int> objects;
+    // TODO: Remover funções
     updateScoreGraphics();
     updateSpaceshipGraphics();
     updateAsteroidsGraphics();
@@ -39,8 +43,14 @@ void game_engine_thread_function(void)
         status = tx_event_flags_get(&event_flags, FLAG0, TX_OR_CLEAR, &flag, TX_WAIT_FOREVER);
         if(TX_SUCCESS != status) __BKPT(0);
 
-        // TODO: Lembrar de passar inputs para a classe Space
         getInputs();
+        // space.setInputs()
+        objects = space.update();
+        if(space.getGameOver()) {
+            // Verifica quantos pontos fez, se precisar atualiza o recorde
+            // Manda para a tela inicial
+        }
+
         updateGame();
 
         tx_event_flags_set(&event_flags, FLAG1, TX_OR);
@@ -97,6 +107,7 @@ void getInputs() {
             // TODO: Adicionar tiro e remover a parte do score
             updateScoreGraphics();
         } else {
+            // TODO: Enviar ângulo da nave para o space
             calculateSpaceshipAimAngle(message);
         }
         status = tx_queue_receive(&control_queue, &message, TX_NO_WAIT);
