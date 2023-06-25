@@ -10,6 +10,7 @@
 void updateDraw(GX_WINDOW *widget);
 
 extern GX_CANVAS display_1_canvas_control_block;
+extern int recordScore;
 
 extern VOID custom_widget_draw(GX_WIDGET *widget, GX_PIXELMAP *pixelmap);
 extern VOID big_asteroid1_widget_draw(GX_WIDGET *widget);
@@ -19,7 +20,7 @@ extern VOID small_asteroid2_widget_draw(GX_WIDGET *widget);
 extern VOID bullet_widget_draw(GX_WIDGET *widget);
 
 void updateScore(UINT score);
-void updateRecordScore(UINT score);
+void updateRecordScore();
 void updateSpaceShip(int angle, GX_WINDOW *window);
 
 void updateWidgets(int num_message, GX_WINDOW *window);
@@ -44,7 +45,6 @@ void updateDraw(GX_WINDOW *widget) {
     while(TX_SUCCESS == status) {
         if((message & MASK_TYPE) >> SHIFT_TYPE == SPACESHIP) updateSpaceShip(message & 0x0003FFFF, widget);
         if((message & MASK_TYPE) >> SHIFT_TYPE == SCORE) updateScore(message & 0x0003FFFF);
-        if((message & MASK_TYPE) >> SHIFT_TYPE == RECORD_SCORE) updateRecordScore(message & 0x0003FFFF);
         if(((message & MASK_TYPE) >> SHIFT_TYPE == BULLET) || ((message & MASK_TYPE) >> SHIFT_TYPE == BIG_ASTEROID) || ((message & MASK_TYPE) >> SHIFT_TYPE == SMALL_ASTEROID)) {
             widgetsToUpdate[i] = (int) message;
             i++;
@@ -183,10 +183,10 @@ void updateScore(UINT score) {
     if(GX_SUCCESS != status) __BKPT(0);
 }
 
-void updateRecordScore(UINT score) {
+void updateRecordScore() {
     GX_WIDGET *widget_found;
 
-    snprintf(score_buffer, sizeof(score_buffer), "%d", score);
+    snprintf(score_buffer, sizeof(score_buffer), "%d", recordScore);
     GX_STRING new_string;
     new_string.gx_string_ptr = score_buffer;
     new_string.gx_string_length = strlen(new_string.gx_string_ptr);

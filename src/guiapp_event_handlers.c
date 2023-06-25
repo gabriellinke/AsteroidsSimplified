@@ -15,6 +15,7 @@ void sendPressedPosition(GX_EVENT *event_ptr);
 static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old, bool isMenu);
 
 extern void updateDraw(GX_WINDOW *widget);
+extern void updateRecordScore();
 
 UINT window1_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
 {
@@ -109,6 +110,8 @@ static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old
     }
 
     gx_system_focus_claim(p_new);
+
+    if(isMenu) updateRecordScore();
 
     GX_WIDGET * p_old = p_widget;
     if (p_old && detach_old)

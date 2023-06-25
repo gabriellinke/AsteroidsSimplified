@@ -31,7 +31,7 @@ std::vector<int> Space::update() {
 
     // Retorna objetos no formato que é utilizado na fila gráfica (id/tipo/x/y ou id/tipo/angulo)
     score++;
-    if(score > 500)
+    if(score > 100)
         gameOver = 1;
 
     return objects;

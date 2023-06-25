@@ -14,6 +14,7 @@ INT angle = 0;
 INT x1 = 20, x2 = 200, y1 = 20, y2 = 280, x3 = 0, y3 = 0;
 
 int counter = 1000;
+int recordScore;
 
 void updateScoreGraphics();
 void updateSpaceshipGraphics();
@@ -49,6 +50,7 @@ void game_engine_thread_function(void)
         if(space.getGameOver()) {
             // Verifica quantos pontos fez, se precisar atualiza o recorde
             // Manda para a tela inicial
+            recordScore = points;
             tx_event_flags_set(&event_flags, FLAG2, TX_OR); // Seta flag para voltar para o Menu
         }
 

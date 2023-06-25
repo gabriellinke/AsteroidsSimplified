@@ -8,7 +8,6 @@
 #define BIG_ASTEROID 2
 #define SMALL_ASTEROID 3
 #define SCORE 4
-#define RECORD_SCORE 5
 #define BULLET_SIZE 3
 #define BIG_ASTEROID_SIZE 32
 #define SMALL_ASTEROID_SIZE 16
