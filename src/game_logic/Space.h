@@ -17,7 +17,7 @@ public:
     ~Space();
 
     std::vector<int> update();
-    void setInputs(int input);
+    void setInputs(std::vector<int> inputs);
 
     int getGameOver();
     int getScore();

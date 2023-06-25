@@ -17,10 +17,10 @@ Space::Space()
     objects.push_back(spaceship);
 
     // Criando os asteroids
-    objects.push_back(new Asteroids(10, 10, 2, true));
-    objects.push_back(new Asteroids(20, 20, 3, true));
-    objects.push_back(new Asteroids(30, 30, 4, true));
-    objects.push_back(new Asteroids(40, 40, 5, true));
+    objects.push_back(new Asteroids(200, 200, 2, true));
+    objects.push_back(new Asteroids(180, 180, 3, true));
+    objects.push_back(new Asteroids(160, 160, 4, true));
+    objects.push_back(new Asteroids(220, 220, 5, true));
 
 }
 
@@ -90,6 +90,19 @@ bool Space::checkCollision(Object* obj1, Object* obj2) {
 
 
 std::vector<int> Space::update() {
+    for (auto it = inputs.begin(); it != inputs.end(); it++) {
+        int inputMessage = *it;
+
+        if((inputMessage >> SHIFT_INPUT) == SHOT_MESSAGE) {
+            //TODO: Spaceship.shot();
+            score+=10;// TODO: Remover - só usado para testes
+        }
+        else { // Mover nave
+            int newAngle = (inputMessage & MASK_INPUT);
+            //TODO: Spaceship.setAngle(newAngle);
+        }
+    }
+
     // Update all objects in the space
 /*
     for (auto it = objects.begin(); it != objects.end();) {
@@ -108,11 +121,16 @@ std::vector<int> Space::update() {
         }
     }
 */
+
+    // Retorna objetos no formato que é utilizado na fila gráfica
     std::vector<int> objectsToReturn;
     for (auto it = objects.begin(); it != objects.end(); it++) {
         Object* object = *it;
         objectsToReturn.push_back(object->getObjectAsMessage());
     }
+
+    int update_score_message = SCORE << SHIFT_TYPE | score;
+    objectsToReturn.push_back(update_score_message);
 
     return objectsToReturn;
 }
@@ -143,8 +161,8 @@ void Space::generateAsteroids(int n)
 }
 
 
-void Space::setInputs(int input) {
-    inputs.push_back(input);
+void Space::setInputs(std::vector<int> inputs) {
+    this->inputs = inputs;
 }
 
 int Space::getGameOver() {

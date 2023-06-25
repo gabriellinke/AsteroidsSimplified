@@ -23,6 +23,7 @@
 #define SHIFT_COORDS_X 9
 #define MASK_COORDS_Y 0x000001FF
 #define SHIFT_COORDS_Y 0
+#define MASK_INPUT 0x3FFFFFFF
 #define SHIFT_INPUT 30
 #define Y_MAX 320
 #define X_MAX 240
