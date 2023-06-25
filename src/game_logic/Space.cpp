@@ -30,6 +30,9 @@ std::vector<int> Space::update() {
     // Verifica se o jogo acabou ou não
 
     // Retorna objetos no formato que é utilizado na fila gráfica (id/tipo/x/y ou id/tipo/angulo)
+    score++;
+    if(score > 500)
+        gameOver = 1;
 
     return objects;
 }

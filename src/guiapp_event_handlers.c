@@ -9,9 +9,10 @@
 extern TX_THREAD game_engine_thread;
 extern TX_THREAD spaceship_control_thread;
 extern GX_WINDOW_ROOT* p_window_root;
+extern TX_SEMAPHORE g_ssp_common_initialized_semaphore;
 
 void sendPressedPosition(GX_EVENT *event_ptr);
-static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old);
+static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old, bool isMenu);
 
 extern void updateDraw(GX_WINDOW *widget);
 
@@ -23,7 +24,7 @@ UINT window1_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
     {
         // Se foi gerado um evento de clique no botão de inciar jogo, renderiza a tela de jogo (segunda tela)
         case GX_SIGNAL(ID_BUTTON, GX_EVENT_CLICKED):
-            show_window((GX_WINDOW*)&window2, (GX_WIDGET*)widget, true);
+            show_window((GX_WINDOW*)&window2, (GX_WIDGET*)widget, true, false);
             break;
         default:
             gx_window_event_process(widget, event_ptr);
@@ -49,6 +50,12 @@ UINT window2_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
             if(TX_SUCCESS != result) __BKPT(0);
             // Cada vez que o timer estourar atualiza a tela
             updateDraw(widget);
+
+            result = tx_event_flags_get(&event_flags, FLAG2, TX_OR_CLEAR, &flag, TX_NO_WAIT);
+            if(TX_SUCCESS == result) { // Se a FLAG2 está setada é porque acabou o jogo
+                show_window((GX_WINDOW*)&window1, (GX_WIDGET*)widget, true, true);
+            }
+
             result = tx_event_flags_set(&event_flags, FLAG0, TX_OR);
             if(TX_SUCCESS != result) __BKPT(0);
             break;
@@ -59,18 +66,38 @@ UINT window2_handler(GX_WINDOW *widget, GX_EVENT *event_ptr)
     return result;
 }
 
-static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old)
+static UINT show_window(GX_WINDOW * p_new, GX_WIDGET * p_widget, bool detach_old, bool isMenu)
 {
     UINT err = GX_SUCCESS;
 
-    // TODO: verificar se tá indo pra tela 2. Se sim, inicia timer. Se tiver indo pra tela 1, desliga timer.
-    // TODO: Também iniciar / parar threads
-    UINT status = tx_thread_resume(&game_engine_thread);
-    if(GX_SUCCESS != status) __BKPT(0);
-    status = tx_thread_resume(&spaceship_control_thread);
-    if(GX_SUCCESS != status) __BKPT(0);
+    if(isMenu) {
+        UINT status;
 
-    gx_system_timer_start(p_new, 1, 2, 2);
+        status = gx_system_timer_stop(&window2, 1);
+        if(GX_SUCCESS != status) __BKPT(0);
+
+        status = tx_thread_terminate(&game_engine_thread);
+        if(TX_SUCCESS != status) __BKPT(0);
+        status = tx_thread_reset(&game_engine_thread);
+        if(TX_SUCCESS != status) __BKPT(0);
+        status = tx_semaphore_ceiling_put(&g_ssp_common_initialized_semaphore, 1);
+        if(TX_SUCCESS != status) __BKPT(0);
+
+        status = tx_thread_suspend(&spaceship_control_thread);
+        if(TX_SUCCESS != status) __BKPT(0);
+
+    } else {
+        UINT status;
+
+        status = tx_thread_resume(&game_engine_thread);
+        if(TX_SUCCESS != status) __BKPT(0);
+
+        status = tx_thread_resume(&spaceship_control_thread);
+        if(TX_SUCCESS != status) __BKPT(0);
+
+        status = gx_system_timer_start(&window2, 1, 2, 2);
+        if(GX_SUCCESS != status) __BKPT(0);
+    }
 
     if (!p_new->gx_widget_parent)
     {

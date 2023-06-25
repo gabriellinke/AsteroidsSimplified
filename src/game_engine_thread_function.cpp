@@ -49,6 +49,7 @@ void game_engine_thread_function(void)
         if(space.getGameOver()) {
             // Verifica quantos pontos fez, se precisar atualiza o recorde
             // Manda para a tela inicial
+            tx_event_flags_set(&event_flags, FLAG2, TX_OR); // Seta flag para voltar para o Menu
         }
 
         updateGame();
@@ -102,6 +103,7 @@ void getInputs() {
     ULONG message, status;
     status = tx_queue_receive(&control_queue, &message, TX_NO_WAIT);
     while(TX_SUCCESS == status) {
+
         if(message >> SHIFT_INPUT == SHOT_MESSAGE) {
             points += 10;
             // TODO: Adicionar tiro e remover a parte do score

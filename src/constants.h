@@ -1,5 +1,6 @@
 #define FLAG0 (1 << 0)
 #define FLAG1 (1 << 1)
+#define FLAG2 (1 << 2)
 #define SHOT_MESSAGE 0x0
 #define TOUCH_MESSAGE 0x2
 #define SPACESHIP 0
