@@ -111,14 +111,7 @@ std::vector<int> Space::update() {
     std::vector<int> objectsToReturn;
     for (auto it = objects.begin(); it != objects.end(); it++) {
         Object* object = *it;
-        int pos_x = object->getPosX();
-        int pos_y = object->getPosY();
-        int id = object->getId();
-        int type = object->getType();
-
-        // TODO: não vai levar em conta a nave, que tem que mandar o ângulo
-        int messageObj = id << SHIFT_ID | type << SHIFT_TYPE | pos_x << SHIFT_COORDS_X | pos_y << SHIFT_COORDS_Y;
-        objectsToReturn.push_back(messageObj);
+        objectsToReturn.push_back(object->getObjectAsMessage());
     }
 
     return objectsToReturn;

@@ -16,6 +16,7 @@ public:
     Object(int x, int y, int size_x, int size_y, int id, int type);
     virtual ~Object();
     virtual void update() = 0;
+    virtual int getObjectAsMessage() = 0;
 
     // Getters
     int getPosX() const;

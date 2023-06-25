@@ -2,6 +2,7 @@
 #define BULLET_H
 
 #include "Object.h"
+#include "constants.h"
 
 class Bullet : public Object
 {
@@ -10,6 +11,7 @@ public:
     virtual ~Bullet();
     void update();
     void calculateLine(int x1, int y1, int x2, int y2);
+    int getObjectAsMessage();
 
 private:
     int m; // y = mx + n
