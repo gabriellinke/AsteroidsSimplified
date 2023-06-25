@@ -1,25 +1,39 @@
-// MyClass.h
 #ifndef SPACE_H
 #define SPACE_H
+
+#include "Asteroids.h"
+#include "Bullet.h"
+#include "Spaceship.h"
+
 #include <vector>
+#include <algorithm>
+#include <ctime>
+#include <cstdlib>
 
-class Space {
-private:
-    int nextId;
-    int gameOver;
-    int score;
-    std::vector<int> objects;
-    std::vector<int> inputs;
-
-    void create();
+class Space
+{
 public:
-    // Constructor
     Space();
+    ~Space();
 
     std::vector<int> update();
     void setInputs(int input);
+
     int getGameOver();
     int getScore();
+
+private:
+    int score;
+    int asteroidCount;
+    bool gameOver;
+
+    std::vector<Object*> objects;
+    std::vector<int> inputs;
+
+    void handleCollisions();
+    bool checkCollision(Object* obj1, Object* obj2);
+    void removeObject(Object* object);
+    void generateAsteroids(int n);
 };
 
-#endif // MYCLASS_H
+#endif // SPACE_H

@@ -3,7 +3,6 @@
 
 #include <stdio.h>
 #include <math.h>
-#include "game_logic/MyClass.h"
 #include "game_logic/Space.h"
 #include <vector>
 
@@ -18,7 +17,6 @@ int recordScore;
 
 void updateScoreGraphics();
 void updateSpaceshipGraphics();
-void updateAsteroidsGraphics();
 
 /*=====================================================================================*/
 
@@ -36,7 +34,6 @@ void game_engine_thread_function(void)
     // TODO: Remover funções
     updateScoreGraphics();
     updateSpaceshipGraphics();
-    updateAsteroidsGraphics();
     tx_event_flags_set(&event_flags, FLAG1, TX_OR);
 
     while (1)
@@ -50,11 +47,19 @@ void game_engine_thread_function(void)
         if(space.getGameOver()) {
             // Verifica quantos pontos fez, se precisar atualiza o recorde
             // Manda para a tela inicial
+            if(space.getScore() > recordScore)
+                recordScore = space.getScore();
             recordScore = points;
             tx_event_flags_set(&event_flags, FLAG2, TX_OR); // Seta flag para voltar para o Menu
         }
 
-        updateGame();
+        for (auto it = objects.begin(); it != objects.end(); ++it) {
+            int message = *it;
+            status = tx_queue_send(&graphic_queue, &message, TX_NO_WAIT);
+            if(TX_SUCCESS != status) __BKPT(0);
+        }
+
+        //updateGame();
 
         tx_event_flags_set(&event_flags, FLAG1, TX_OR);
     }
@@ -71,22 +76,6 @@ void updateSpaceshipGraphics() {
     ULONG update_spaceship_message = SPACESHIP << SHIFT_TYPE | angle;
     ULONG status = tx_queue_send(&graphic_queue, &update_spaceship_message, TX_NO_WAIT);
     if(TX_SUCCESS != status) __BKPT(0);
-}
-
-void updateAsteroidsGraphics() {
-    // Testando se as classes funcionam
-    // Create an instance of MyClass
-    std::vector<int> numbers;
-    MyClass obj(42);
-
-    numbers.push_back(obj.getNumber());
-    numbers.push_back(obj.getNumber());
-    numbers.push_back(obj.getNumber());
-
-    int number = 0;
-    for (const auto& element : numbers) {
-        number += element;
-    }
 }
 
 void calculateSpaceshipAimAngle(UINT coord) {
