@@ -1,30 +1,34 @@
 #include "Asteroids.h"
 #include <ctime>
 #include <cstdlib>
+#include <math.h>
 
 Asteroids::Asteroids(float x, float y, int id, bool big) : Object(x, y, SMALL_ASTEROID_SIZE, SMALL_ASTEROID_SIZE, id, SMALL_ASTEROID)
 {
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
     int aux = std::rand() % 2;
     if(aux == 1)
-        velocity_x = -2;
+        velocity_x = -1;
     else
-        velocity_x =2;
+        velocity_x =1;
 
     std::srand(static_cast<unsigned int>(std::time(nullptr)));
     aux = std::rand() % 2;
     if(aux == 1)
-        velocity_y = -2;
+        velocity_y = -1;
     else
-        velocity_y = 2;
+        velocity_y = 1;
 
     // Defina o tamanho do asteroide com base no parâmetro "big"
     if (big) {
         width = BIG_ASTEROID_SIZE;
         height = BIG_ASTEROID_SIZE;
         type = BIG_ASTEROID;
-        velocity_x = velocity_x/2;
-        velocity_y = velocity_y/2;
+        velocity_x *= BIG_ASTEROID_VELOCITY/sqrt(2);
+        velocity_y *= BIG_ASTEROID_VELOCITY/sqrt(2);
+    } else {
+        velocity_x *= SMALL_ASTEROID_VELOCITY/sqrt(2);
+        velocity_y *= SMALL_ASTEROID_VELOCITY/sqrt(2);
     }
 
 }
