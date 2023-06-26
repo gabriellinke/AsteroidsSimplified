@@ -12,7 +12,7 @@ Space::Space()
 
     // Criando a spaceship
     int center_x = X_MAX/2 - SPACESHIP_SIZE/2;
-    int center_y = Y_MAX/2 - SPACESHIP_SIZE/2;
+    int center_y = Y_MAX/2 + SPACESHIP_SIZE/2;
     spaceship = new Spaceship(center_x, center_y, 1);
     objects.push_back(spaceship);
 
@@ -103,6 +103,12 @@ std::vector<int> Space::update() {
             spaceship->setAngle(newAngle);
         }
     }
+
+    for (auto it = objects.begin(); it != objects.end(); it++) {
+        Object* object = *it;
+        object->update();
+    }
+
 
     // Update all objects in the space
 /*
