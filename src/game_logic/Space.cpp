@@ -6,6 +6,7 @@
 
 Space::Space()
 {
+    idCounter = 1;
     asteroidCount = 4;
     score = 0;
     gameOver = 0;
@@ -13,15 +14,11 @@ Space::Space()
     // Criando a spaceship
     int center_x = X_MAX/2 - SPACESHIP_SIZE/2;
     int center_y = Y_MAX/2 + SPACESHIP_SIZE/2;
-    spaceship = new Spaceship(center_x, center_y, 1);
-    objects.push_back(spaceship);
+    spaceship = new Spaceship(center_x, center_y, idCounter);
+    addObject(spaceship);
 
     // Criando os asteroids
-    objects.push_back(new Asteroids(200, 200, 2, true));
-    objects.push_back(new Asteroids(180, 180, 3, true));
-    objects.push_back(new Asteroids(160, 160, 4, true));
-    objects.push_back(new Asteroids(220, 220, 5, true));
-
+    generateAsteroids(4);
 }
 
 Space::~Space()
@@ -30,6 +27,7 @@ Space::~Space()
         delete object;
     }
 }
+
 void Space::handleCollisions() {
     for (auto it1 = objects.begin(); it1 != objects.end(); ++it1) {
         Object* obj1 = *it1;
@@ -39,34 +37,40 @@ void Space::handleCollisions() {
 
             // Check collision between obj1 and obj2
             if (checkCollision(obj1, obj2)) {
-                if (obj1->getId() == 1 && obj2->getId() == 3 ||
-                    obj1->getId() == 1 && obj2->getId() == 4 ||
-                    obj1->getId() == 4 && obj2->getId() == 1 ||
-                    obj1->getId() == 3 && obj2->getId() == 1)
+                if ((obj1->getId() == SPACESHIP      && obj2->getId() == SMALL_ASTEROID) ||
+                    (obj1->getId() == SPACESHIP      && obj2->getId() == BIG_ASTEROID) ||
+                    (obj1->getId() == SMALL_ASTEROID && obj2->getId() == SPACESHIP) ||
+                    (obj1->getId() == BIG_ASTEROID   && obj2->getId() == SPACESHIP))
                 {
                     gameOver = true;
                 }
-                else if(obj1->getId() == 2 && obj2->getId() == 3 ||
-                    obj1->getId() == 2 && obj2->getId() == 4 ||
-                    obj1->getId() == 4 && obj2->getId() == 2 ||
-                    obj1->getId() == 3 && obj2->getId() == 2)
+                else if((obj1->getId() == BULLET         && obj2->getId() == BIG_ASTEROID) ||
+                        (obj1->getId() == BULLET         && obj2->getId() == SMALL_ASTEROID) ||
+                        (obj1->getId() == SMALL_ASTEROID && obj2->getId() == BULLET) ||
+                        (obj1->getId() == BIG_ASTEROID   && obj2->getId() == BULLET))
                 {
-                    if(obj1->getId()== 3){
-                        objects.push_back(new Asteroids(obj1->getPosX()+40, obj1->getPosY()+40, 2, false));
-                        objects.push_back(new Asteroids(obj1->getPosX()-40, obj1->getPosY()-40, 2, false));
-                    }
-                    else if (obj2->getId()== 3){
-                        objects.push_back(new Asteroids(obj2->getPosX()+40, obj1->getPosY()+40, 2, false));
-                        objects.push_back(new Asteroids(obj2->getPosX()-40, obj2->getPosY()-40, 2, false));
-                    }
                     if(obj1->getIsAlive() == true)
+                    {
+                        if(obj1->getId()== BIG_ASTEROID){
+                            generateSmallAsteroids(obj1);
+                        }
+                        else if (obj2->getId()== BIG_ASTEROID){
+                            generateSmallAsteroids(obj2);
+                        }
                         score++;
+                    }
                     obj1->setIsAlive(false);
                     obj2->setIsAlive(false);
                 }
             }
         }
     }
+}
+
+void Space::generateSmallAsteroids(Object* bigAsteroid)
+{
+    objects.push_back(new Asteroids(bigAsteroid->getPosX()+40, bigAsteroid->getPosY()+40, 2, false));
+    objects.push_back(new Asteroids(bigAsteroid->getPosX()-40, bigAsteroid->getPosY()-40, 2, false));
 }
 
 bool Space::checkCollision(Object* obj1, Object* obj2) {
@@ -92,11 +96,9 @@ bool Space::checkCollision(Object* obj1, Object* obj2) {
 std::vector<int> Space::update() {
     for (auto it = inputs.begin(); it != inputs.end(); it++) {
         int inputMessage = *it;
-
         if((inputMessage >> SHIFT_INPUT) == SHOT_MESSAGE) {
-            score+=10;// TODO: Remover - só usado para testes
-            Bullet* bullet = spaceship->shoot(30); //TODO: Adicionar id correto
-            objects.push_back(bullet);
+            Bullet* bullet = spaceship->shoot(idCounter);
+            addObject(bullet);
         }
         else { // Mover nave
             int newAngle = (inputMessage & MASK_INPUT);
@@ -162,11 +164,15 @@ void Space::generateAsteroids(int n)
         std::srand(static_cast<unsigned int>(std::time(nullptr)));
         int posy = std::rand() % 240;
 
-        objects.push_back(new Asteroids(posx, posy, 2, true));
+        addObject(new Asteroids(posx, posy, idCounter, true));
         n--;
     }
 }
 
+void Space::addObject(Object* object) {
+    objects.push_back(object);
+    idCounter++;
+}
 
 void Space::setInputs(std::vector<int> inputs) {
     this->inputs = inputs;

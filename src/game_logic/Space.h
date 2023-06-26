@@ -25,12 +25,15 @@ public:
 private:
     int score;
     int asteroidCount;
+    int idCounter;
     bool gameOver;
     Spaceship* spaceship;
 
     std::vector<Object*> objects;
     std::vector<int> inputs;
 
+    void addObject(Object* object);
+    void generateSmallAsteroids(Object* bigAsteroid);
     void handleCollisions();
     bool checkCollision(Object* obj1, Object* obj2);
     void removeObject(Object* object);
