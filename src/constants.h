@@ -28,3 +28,6 @@
 #define Y_MAX 320
 #define X_MAX 240
 #define PI 3.14159
+#define BULLET_VELOCITY 4
+#define SMALL_ASTEROID_VELOCITY 3
+#define BIG_ASTEROID_VELOCITY 2

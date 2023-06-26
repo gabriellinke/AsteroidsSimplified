@@ -1,15 +1,32 @@
 #include "Asteroids.h"
+#include <ctime>
+#include <cstdlib>
 
-Asteroids::Asteroids(int x, int y, int id, bool big) : Object(x, y, SMALL_ASTEROID_SIZE, SMALL_ASTEROID_SIZE, id, SMALL_ASTEROID)
+Asteroids::Asteroids(float x, float y, int id, bool big) : Object(x, y, SMALL_ASTEROID_SIZE, SMALL_ASTEROID_SIZE, id, SMALL_ASTEROID)
 {
-    vel_x = 0;
-    vel_y = 0;
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    int aux = std::rand() % 2;
+    if(aux == 1)
+        velocity_x = -2;
+    else
+        velocity_x =2;
+
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
+    aux = std::rand() % 2;
+    if(aux == 1)
+        velocity_y = -2;
+    else
+        velocity_y = 2;
+
     // Defina o tamanho do asteroide com base no parâmetro "big"
     if (big) {
         width = BIG_ASTEROID_SIZE;
         height = BIG_ASTEROID_SIZE;
         type = BIG_ASTEROID;
+        velocity_x = velocity_x/2;
+        velocity_y = velocity_y/2;
     }
+
 }
 
 Asteroids::~Asteroids()
@@ -19,12 +36,22 @@ Asteroids::~Asteroids()
 
 void Asteroids::update()
 {
-    // Atualize a posição e outras propriedades do asteroide
-    // Implementação vai aqui
+    pos_x = pos_x + velocity_x;
+    pos_y = pos_y + velocity_y;
+
+    if(pos_x < 0)
+        pos_x = X_MAX;
+    else if(pos_x > X_MAX)
+        pos_x =0;
+
+    if(pos_y < 0)
+        pos_y = Y_MAX;
+    else if(pos_y > Y_MAX)
+        pos_y =0;
 }
 
 int Asteroids::getObjectAsMessage()
 {
-    int messageObj = id << SHIFT_ID | type << SHIFT_TYPE | pos_x << SHIFT_COORDS_X | pos_y << SHIFT_COORDS_Y;
+    int messageObj = id << SHIFT_ID | type << SHIFT_TYPE | (int)pos_x << SHIFT_COORDS_X | (int)pos_y << SHIFT_COORDS_Y;
     return messageObj;
 }

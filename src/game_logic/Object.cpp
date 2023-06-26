@@ -1,6 +1,6 @@
 #include "Object.h"
 
-Object::Object(int x, int y, int tam_x, int tam_y, int id, int type)
+Object::Object(float x, float y, int tam_x, int tam_y, int id, int type)
     : pos_x(x), pos_y(y), width(tam_x), height(tam_y), id(id), type(type), isAlive(true)
 {
 }
@@ -13,11 +13,11 @@ Object::~Object()
 #include "Object.h"
 
 // Getters
-int Object::getPosX() const {
+float Object::getPosX() const {
     return pos_x;
 }
 
-int Object::getPosY() const {
+float Object::getPosY() const {
     return pos_y;
 }
 
@@ -42,11 +42,11 @@ bool Object::getIsAlive() const {
 }
 
 // Setters
-void Object::setPosX(int x) {
+void Object::setPosX(float x) {
     pos_x = x;
 }
 
-void Object::setPosY(int y) {
+void Object::setPosY(float y) {
     pos_y = y;
 }
 
@@ -59,11 +59,11 @@ void Object::setHeight(int h) {
 }
 
 void Object::setId(int id) {
-    id = id;
+    this->id = id;
 }
 
 void Object::setType(int type) {
-    type = type;
+    this->type = type;
 }
 
 void Object::setIsAlive(bool alive) {

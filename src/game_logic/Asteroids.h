@@ -7,13 +7,14 @@
 class Asteroids : public Object
 {
 public:
-    Asteroids(int x, int y, int id, bool big);
+    Asteroids(float x, float y, int id, bool big);
     virtual ~Asteroids();
     void update();
     int getObjectAsMessage();
 
 private:
-    int vel_x, vel_y;
+    float velocity_x;
+    float velocity_y;
 };
 
 #endif // ASTEROIDS_H

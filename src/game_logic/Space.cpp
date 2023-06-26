@@ -13,7 +13,7 @@ Space::Space()
     // Criando a spaceship
     int center_x = X_MAX/2 - SPACESHIP_SIZE/2;
     int center_y = Y_MAX/2 - SPACESHIP_SIZE/2;
-    Spaceship* spaceship = new Spaceship(center_x, center_y, 1);
+    spaceship = new Spaceship(center_x, center_y, 1);
     objects.push_back(spaceship);
 
     // Criando os asteroids
@@ -70,15 +70,15 @@ void Space::handleCollisions() {
 }
 
 bool Space::checkCollision(Object* obj1, Object* obj2) {
-    int obj1_left = obj1->getPosX();
-    int obj1_right = obj1->getPosX() + obj1->getWidth();
-    int obj1_top = obj1->getPosY();
-    int obj1_bottom = obj1->getPosY() + obj1->getHeight();
+    float obj1_left = obj1->getPosX();
+    float obj1_right = obj1->getPosX() + obj1->getWidth();
+    float obj1_top = obj1->getPosY();
+    float obj1_bottom = obj1->getPosY() + obj1->getHeight();
 
-    int obj2_left = obj2->getPosX();
-    int obj2_right = obj2->getPosX() + obj2->getWidth();
-    int obj2_top = obj2->getPosY();
-    int obj2_bottom = obj2->getPosY() + obj2->getHeight();
+    float obj2_left = obj2->getPosX();
+    float obj2_right = obj2->getPosX() + obj2->getWidth();
+    float obj2_top = obj2->getPosY();
+    float obj2_bottom = obj2->getPosY() + obj2->getHeight();
 
     if (obj1_right >= obj2_left && obj1_left <= obj2_right &&
         obj1_bottom >= obj2_top && obj1_top <= obj2_bottom) {
@@ -94,12 +94,13 @@ std::vector<int> Space::update() {
         int inputMessage = *it;
 
         if((inputMessage >> SHIFT_INPUT) == SHOT_MESSAGE) {
-            //TODO: Spaceship.shot();
             score+=10;// TODO: Remover - só usado para testes
+            Bullet* bullet = spaceship->shoot(30); //TODO: Adicionar id correto
+            objects.push_back(bullet);
         }
         else { // Mover nave
             int newAngle = (inputMessage & MASK_INPUT);
-            //TODO: Spaceship.setAngle(newAngle);
+            spaceship->setAngle(newAngle);
         }
     }
 

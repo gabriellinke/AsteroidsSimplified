@@ -4,8 +4,8 @@
 class Object
 {
 protected:
-    int pos_x;
-    int pos_y;
+    float pos_x;
+    float pos_y;
     int width;
     int height;
     int id;
@@ -13,14 +13,14 @@ protected:
     bool isAlive;
 
 public:
-    Object(int x, int y, int size_x, int size_y, int id, int type);
+    Object(float  x, float y, int size_x, int size_y, int id, int type);
     virtual ~Object();
     virtual void update() = 0;
     virtual int getObjectAsMessage() = 0;
 
     // Getters
-    int getPosX() const;
-    int getPosY() const;
+    float getPosX() const;
+    float getPosY() const;
     int getWidth() const;
     int getHeight() const;
     int getId() const;
@@ -28,8 +28,8 @@ public:
     bool getIsAlive() const;
 
     // Setters
-    void setPosX(int x);
-    void setPosY(int y);
+    void setPosX(float x);
+    void setPosY(float y);
     void setWidth(int w);
     void setHeight(int h);
     void setId(int id);

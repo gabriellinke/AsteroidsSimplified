@@ -26,6 +26,7 @@ private:
     int score;
     int asteroidCount;
     bool gameOver;
+    Spaceship* spaceship;
 
     std::vector<Object*> objects;
     std::vector<int> inputs;

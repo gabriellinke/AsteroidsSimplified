@@ -1,9 +1,10 @@
 #include "Bullet.h"
 
-Bullet::Bullet(int pos_x, int pos_y, int pos_final_x, int pos_final_y, int id)
-    : Object(pos_x, pos_y, BULLET_SIZE, BULLET_SIZE, id, BULLET), m(0), n(0)
+Bullet::Bullet(float pos_x, float pos_y, float velocity_x, float velocity_y, int id)
+    : Object(pos_x, pos_y, BULLET_SIZE, BULLET_SIZE, id, BULLET)
 {
-    calculateLine(pos_x, pos_y, pos_final_x, pos_final_y);
+    this->velocity_x = velocity_x;
+    this->velocity_y = velocity_y;
 }
 
 Bullet::~Bullet()
@@ -14,15 +15,17 @@ Bullet::~Bullet()
 void Bullet::update()
 {
     // Update logic for bullet
+    pos_x += velocity_x;
+    pos_y += velocity_y;
+
+    if(pos_x > X_MAX || pos_y > Y_MAX || pos_x < 0 || pos_y < 0){
+        isAlive = false;
+    }
 }
 
-void Bullet::calculateLine(int x1, int y1, int x2, int y2)
-{
-    // Logic to calculate the line equation for the bullet
-}
 
 int Bullet::getObjectAsMessage()
 {
-    int messageObj = id << SHIFT_ID | type << SHIFT_TYPE | pos_x << SHIFT_COORDS_X | pos_y << SHIFT_COORDS_Y;
+    int messageObj = id << SHIFT_ID | type << SHIFT_TYPE | (int)pos_x << SHIFT_COORDS_X | (int)pos_y << SHIFT_COORDS_Y;
     return messageObj;
 }
